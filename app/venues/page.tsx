@@ -51,3 +51,5 @@ const Page: React.FC = () => (
     </Section>
   </Master>
 );
+
+export default Page;
