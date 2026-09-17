@@ -72,9 +72,9 @@ const getResponse = async (parameters: IRequest): Promise<IResponse> => {
 
   try {
     if (parameters.method === 'GET') {
-      response = await axios.get(url, { headers, timeout: 15000 });
+      response = await axios.get(url, { headers, timeout: 90000 });
     } else if (parameters.method === 'POST') {
-      response = await axios.post(url, parameters.postData, { headers, timeout: 15000 });
+      response = await axios.post(url, parameters.postData, { headers, timeout: 90000 });
     } else {
       throw new Error('Invalid HTTP method. Please use GET or POST.');
     }
