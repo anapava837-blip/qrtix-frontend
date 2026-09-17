@@ -67,24 +67,32 @@ const newsData = {
   }
 };
 
-export const generateMetadata = ({ params }: { params: { url: string } }): Metadata => {
-  const event = newsData[params.url as keyof typeof newsData];
-  
+interface PageProps {
+  params: Promise<{
+    url: string;
+  }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const resolvedParams = await params;
+  const event = newsData[resolvedParams.url as keyof typeof newsData];
+
   if (!event) {
     return {
       title: 'Evento no encontrado',
       description: 'QRTixsPro - Sistema de venta de boletos para eventos en Colombia',
     };
   }
-  
+
   return {
     title: `${event.title} - QRTixsPro`,
     description: event.content.substring(0, 160),
   };
-};
+}
 
-const Page = ({ params }: { params: { url: string } }) => {
-  const eventId = params.url;
+const Page = async ({ params }: PageProps) => {
+  const resolvedParams = await params;
+  const eventId = resolvedParams.url;
   const event = newsData[eventId as keyof typeof newsData];
 
   // Si no se encuentra el evento, mostrar página de error
@@ -129,7 +137,7 @@ const Page = ({ params }: { params: { url: string } }) => {
           <Heading type={6} color='white' text={event.location} />
         </div>
       </div>
-      
+
       <Section className='white-background'>
         <div className='container'>
           <div className='event-details'>
@@ -143,7 +151,7 @@ const Page = ({ params }: { params: { url: string } }) => {
                     </p>
                   </div>
                 </Box>
-                
+
                 <Box className="info-box mt-20">
                   <div className='info-details'>
                     <div className='info-item'>
@@ -169,12 +177,12 @@ const Page = ({ params }: { params: { url: string } }) => {
                     </div>
                   </div>
                 </Box>
-                
+
                 <div className='buttons-container' style={{ marginTop: '30px' }}>
                   <ButtonLink color="gray-overlay" text="Volver a eventos" url="/news" />
                 </div>
               </div>
-              
+
               <div className='col-md-4'>
                 <Box className="ticket-box">
                   <Heading type={4} color='gray' text='Más Información' />
@@ -188,9 +196,9 @@ const Page = ({ params }: { params: { url: string } }) => {
           </div>
         </div>
       </Section>
-      
-      <CardGroup 
-        title="Eventos relacionados" 
+
+      <CardGroup
+        title="Eventos relacionados"
         color={event.color}
         gridClassName="events-grid"
       >
