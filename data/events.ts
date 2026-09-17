@@ -12,6 +12,7 @@ export interface Event {
   };
   image: string;
   color: string;
+  priceFrom: string;
   tickets: Array<{
     id: number;
     name: string;
@@ -20,6 +21,8 @@ export interface Event {
     information?: string;
   }>;
 }
+
+export const DEFAULT_PRICE_FROM = '45.000';
 
 export const events: Event[] = [
   {
@@ -42,6 +45,7 @@ Es el cuarto equipo que representa a la ciudad de Villavicencio en el fútbol pr
     },
     image: "/imagenes/llaneros.jpg",
     color: "blue",
+    priceFrom: "45.000",
     tickets: [
       {
         id: 2,
@@ -74,6 +78,7 @@ Una experiencia única que desafía las formas tradicionales de consumir noticia
     },
 image: "/imagenes/fucks.jpg",
     color: "blue",
+    priceFrom: "80.000",
     tickets: [
       {
         id: 1,
@@ -113,6 +118,7 @@ Además, contaremos con zonas de comida saludable para niños, áreas de descans
     },
     image: "https://images.unsplash.com/photo-1531058020387-3be344556be6?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     color: "orange",
+    priceFrom: "25.000",
     tickets: [
       {
         id: 1,
@@ -152,6 +158,7 @@ Una celebración del talento musical nacional que no te puedes perder, con sorpr
     },
     image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     color: "red",
+    priceFrom: "60.000",
     tickets: [
       {
         id: 1,
@@ -189,6 +196,7 @@ Una oportunidad perfecta para explorar nuevos sabores, aprender técnicas culina
     },
     image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     color: "green",
+    priceFrom: "35.000",
     tickets: [
       {
         id: 1,
@@ -228,6 +236,7 @@ Una oportunidad única de disfrutar del mejor teatro musical sin salir del país
     },
     image: "https://images.unsplash.com/photo-1507924538820-ede94a04019d?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     color: "purple",
+    priceFrom: "120.000",
     tickets: [
       {
         id: 1,
@@ -265,6 +274,7 @@ Una oportunidad única para aprender sobre inteligencia artificial, blockchain, 
     },
     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     color: "blue",
+    priceFrom: "95.000",
     tickets: [
       {
         id: 1,
@@ -303,6 +313,7 @@ Una experiencia cultural que celebra la riqueza musical de nuestra región y la 
     },
     image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     color: "orange",
+    priceFrom: "75.000",
     tickets: [
       {
         id: 1,
@@ -341,6 +352,7 @@ Una oportunidad única para explorar las tendencias actuales del arte contempor�
     },
     image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     color: "red",
+    priceFrom: "55.000",
     tickets: [
       {
         id: 1,
@@ -379,6 +391,7 @@ Además de la competencia, el evento incluye una feria de la salud, stands de nu
     },
     image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     color: "green",
+    priceFrom: "40.000",
     tickets: [
       {
         id: 1,
@@ -418,6 +431,7 @@ Además de las proyecciones, el evento incluye masterclasses, paneles de discusi
     },
     image: "https://images.unsplash.com/photo-1489599904472-84b0e19be5b9?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     color: "purple",
+    priceFrom: "65.000",
     tickets: [
       {
         id: 1,
@@ -456,6 +470,7 @@ Una velada cultural que combina la tradición sinfónica con la innovación musi
     },
     image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     color: "blue",
+    priceFrom: "90.000",
     tickets: [
       {
         id: 1,
