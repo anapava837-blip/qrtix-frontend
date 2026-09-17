@@ -8,8 +8,8 @@ import EventCard from '@components/Card/EventCard';
 import CardGroup from '@components/Card/CardGroup';
 import Box from '@components/Box/Box';
 
-// Importar los datos de lugares desde la página de venues
-import { venuesData } from '../../venues/page';
+// Importar los datos de lugares desde data centralizado
+import { venuesData } from '@data/venues';
 
 interface PageProps {
   params: Promise<{

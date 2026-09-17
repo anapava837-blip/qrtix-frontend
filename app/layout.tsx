@@ -6,7 +6,9 @@ import './styles/ui.css';
 import './styles/site.css';
 
 // variables
-export const runtime = 'edge';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 const RootLayout: React.FC<Readonly<{ children: React.ReactNode }>> = ({ children }) => (
   <html lang='en'>
