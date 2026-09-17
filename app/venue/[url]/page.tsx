@@ -11,24 +11,32 @@ import Box from '@components/Box/Box';
 // Importar los datos de lugares desde la página de venues
 import { venuesData } from '../../venues/page';
 
-export const generateMetadata = ({ params }: { params: { url: string } }): Metadata => {
-  const venue = venuesData[params.url as keyof typeof venuesData];
-  
+interface PageProps {
+  params: Promise<{
+    url: string;
+  }>;
+}
+
+export const generateMetadata = async ({ params }: PageProps): Promise<Metadata> => {
+  const resolvedParams = await params;
+  const venue = venuesData[resolvedParams.url as keyof typeof venuesData];
+
   if (!venue) {
     return {
       title: 'Lugar no encontrado - QRTixsPro',
       description: 'QRTixsPro - Sistema de venta de boletos para eventos en Colombia',
     };
   }
-  
+
   return {
     title: `${venue.name} - QRTixsPro`,
     description: venue.description.substring(0, 160),
   };
 };
 
-const Page = ({ params }: { params: { url: string } }) => {
-  const venueId = params.url;
+const Page = async ({ params }: PageProps) => {
+  const resolvedParams = await params;
+  const venueId = resolvedParams.url;
   const venue = venuesData[venueId as keyof typeof venuesData];
 
   // Si no se encuentra el lugar, mostrar página de error
@@ -76,7 +84,7 @@ const Page = ({ params }: { params: { url: string } }) => {
                 <p>{venue.description}</p>
               </div>
             </Box>
-            
+
             <Box className="info-box mt-20">
               <div className='info-details'>
                 <div className='info-item'>
