@@ -3,23 +3,7 @@
 import React from 'react';
 import SeatSelector from './SeatSelector';
 import { Event } from '@data/events';
-
-interface Seat {
-  id: string;
-  row: number;
-  number: number;
-  zone: 'occidental' | 'oriental';
-  price: number;
-  available: boolean;
-}
-
-interface GeneralZone {
-  id: string;
-  zone: 'sur' | 'norte';
-  price: number;
-  capacity: number;
-  selected: boolean;
-}
+import type { Seat, GeneralZone } from '@data/types';
 
 interface SeatSelectorWrapperProps {
   event: Event;

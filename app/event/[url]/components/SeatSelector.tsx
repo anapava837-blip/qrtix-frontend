@@ -4,32 +4,14 @@ import React, { useState, useMemo, useEffect } from 'react';
 import './SeatSelector.css';
 import { Event } from '@data/events';
 import useUser from '@hooks/useUser';
-
-interface Seat {
-  id: string;
-  row: number;
-  number: number;
-  zone: 'occidental' | 'oriental' | 'sur' | 'norte';
-  price: number;
-  available: boolean;
-  cx: number;
-  cy: number;
-}
-
-interface GeneralZone {
-  id: string;
-  zone: 'sur' | 'norte';
-  price: number;
-  capacity: number;
-  selected: boolean;
-}
+import type { Seat, GeneralZone, StadiumZone } from '@data/types';
 
 interface SeatSelectorProps {
   event: Event;
   onSeatSelection: (seats: Seat[], generalZones: GeneralZone[], total: number) => void;
 }
 
-const zonePrices = {
+const zonePrices: Record<StadiumZone, number> = {
   occidental: 85000,
   oriental: 85000,
   sur: 45000,
