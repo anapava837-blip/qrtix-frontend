@@ -1,12 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "frameworkVersion": "15",
   "installCommand": "npm install --no-audit --no-fund --prefer-offline",
   "buildCommand": "next build",
   "outputDirectory": ".next",
   "devCommand": "next dev",
-  "nodeVersion": "20.x",
 
   "headers": [
     {
@@ -37,6 +35,7 @@
   ],
 
   "images": {
+    "sizes": [16, 32, 48, 64, 96, 128, 256, 384, 640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     "formats": ["image/avif", "image/webp"],
     "remotePatterns": [
       { "protocol": "https", "hostname": "**" }
