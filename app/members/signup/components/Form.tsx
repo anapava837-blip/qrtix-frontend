@@ -46,8 +46,8 @@ const Form: React.FC = () => {
       custom: (value: string) => {
         // Para el checkbox, verificamos si está marcado
         return formValues.tos ? null : 'Debe aceptar los términos y condiciones';
-      }
-    }
+      },
+    },
   });
 
   useEffect(() => {
@@ -63,13 +63,16 @@ const Form: React.FC = () => {
    */
   const startCamera = async (): Promise<void> => {
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Tu navegador no permite acceso a la cámara o no estás en HTTPS.');
+      }
       // Solicitar cámara con mayor resolución para mejor detección facial
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
           width: { ideal: 1280 },
           height: { ideal: 720 },
-          facingMode: 'user' // Cámara frontal
-        } 
+          facingMode: 'user', // Cámara frontal
+        },
       });
       streamRef.current = stream;
       if (videoRef.current) {
@@ -77,7 +80,16 @@ const Form: React.FC = () => {
         await videoRef.current.play();
       }
     } catch (err) {
-      showAlert({ type: 'error', text: 'No se pudo activar la cámara' });
+      const msg = err instanceof Error ? err.message : '';
+      let userMsg = '⚠️ No se pudo activar la cámara.\n';
+      if (msg.toLowerCase().includes('permission') || msg.toLowerCase().includes('denied')) {
+        userMsg += '📌 Haz CLICK en el 🔒 CANDELADO (arriba-izq antes de la URL) → Permitir CÁMARA → Actualiza la página (F5).';
+      } else if (msg.toLowerCase().includes('not found') || msg.toLowerCase().includes('device')) {
+        userMsg += '📌 Tu dispositivo no tiene cámara o está siendo usada por otra app (Zoom, Meet).';
+      } else {
+        userMsg += '📌 Usa el candado 🔒 arriba-izq para PERMITIR la CÁMARA, luego actualiza (F5).\nSi no puedes usar la cámara: puedes REGISTRARTE sin foto (luego la subes/activas en tu perfil).';
+      }
+      showAlert({ type: 'error', text: userMsg });
     }
   };
 
@@ -181,10 +193,9 @@ const Form: React.FC = () => {
     // Validar el formulario antes de enviar
     const isValid = validateForm(formValues);
 
-    // Validar que se haya tomado una foto
+    // La foto AHORA ES OPCIONAL (no bloquea el registro)
     if (photoDataUrl === '') {
-      showAlert({ type: 'error', text: 'Por favor, toma una foto para validar' });
-      return;
+      showAlert({ type: 'warning', text: '💡 Registrándote SIN reconocimiento facial. (Recomendamos activar la cámara con el 🔒 candado arriba para mayor seguridad).' });
     }
 
     if (!isValid) {
@@ -204,7 +215,7 @@ const Form: React.FC = () => {
         telefono: formValues.telefono,
         email: formValues.email,
         password: formValues.password,
-        photo: photoDataUrl,
+        photo: photoDataUrl !== '' ? photoDataUrl : null,
         tos: formValues.tos,
       },
     };
@@ -287,7 +298,11 @@ const Form: React.FC = () => {
               required
               onChange={handleChange}
             />
-            {errors.name && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.name}</span>}
+            {errors.name && (
+              <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                {errors.name}
+              </span>
+            )}
           </div>
         </div>
         <div className='form-line'>
@@ -304,7 +319,11 @@ const Form: React.FC = () => {
               required
               onChange={handleChange}
             />
-            {errors.lastname && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.lastname}</span>}
+            {errors.lastname && (
+              <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                {errors.lastname}
+              </span>
+            )}
           </div>
         </div>
         <div className='form-line'>
@@ -321,7 +340,11 @@ const Form: React.FC = () => {
               required
               onChange={handleChange}
             />
-            {errors.cedula && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.cedula}</span>}
+            {errors.cedula && (
+              <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                {errors.cedula}
+              </span>
+            )}
           </div>
         </div>
         <div className='form-line'>
@@ -338,7 +361,11 @@ const Form: React.FC = () => {
               required
               onChange={handleChange}
             />
-            {errors.telefono && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.telefono}</span>}
+            {errors.telefono && (
+              <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                {errors.telefono}
+              </span>
+            )}
           </div>
         </div>
         <div className='form-line'>
@@ -355,7 +382,11 @@ const Form: React.FC = () => {
               required
               onChange={handleChange}
             />
-            {errors.email && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.email}</span>}
+            {errors.email && (
+              <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                {errors.email}
+              </span>
+            )}
           </div>
         </div>
         <div className='form-line'>
@@ -371,7 +402,11 @@ const Form: React.FC = () => {
             required
             onChange={handleChange}
           />
-          {errors.password && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.password}</span>}
+          {errors.password && (
+            <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+              {errors.password}
+            </span>
+          )}
         </div>
         <div className='form-line'>
           <div className='label-line'>
@@ -387,9 +422,13 @@ const Form: React.FC = () => {
               TOS
             </Link>
           </Switch>
-          {errors.tos && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.tos}</span>}
+          {errors.tos && (
+            <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+              {errors.tos}
+            </span>
+          )}
         </div>
-        
+
         {/* Sección de Cámara */}
         <div className='form-line'>
           <div className='label-line'>
@@ -404,14 +443,18 @@ const Form: React.FC = () => {
             />
           </div>
           <div className='one-line'>
-            <button type='button' className='button gray-overlay' onClick={startCamera}>Activar cámara</button>
-            <button type='button' className='button blue-filled' onClick={takePhoto}>Tomar foto</button>
+            <button type='button' className='button gray-overlay' onClick={startCamera}>
+              Activar cámara
+            </button>
+            <button type='button' className='button blue-filled' onClick={takePhoto}>
+              Tomar foto
+            </button>
           </div>
           {photoDataUrl !== '' && (
             <CapturedPhoto image={photoDataUrl} size='large' alt='Foto para verificación' />
           )}
         </div>
-        
+
         <div className='form-buttons'>
           <Button type='submit' color='blue-filled' text='Inscribirse' />
         </div>

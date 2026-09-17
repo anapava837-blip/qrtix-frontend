@@ -40,13 +40,18 @@ const Form: React.FC = () => {
   const streamRef = useRef<MediaStream | null>(null);
 
   // Validaciones
-  const { errors, validateSingleField, validateForm } = useFormValidation(commonValidationRules.signin);
+  const { errors, validateSingleField, validateForm } = useFormValidation(
+    commonValidationRules.signin
+  );
 
   /**
    * Activa la cámara del dispositivo.
    */
   const startCamera = async (): Promise<void> => {
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Tu navegador no permite acceso a la cámara o no estás en HTTPS.');
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       streamRef.current = stream;
       if (videoRef.current) {
@@ -54,7 +59,16 @@ const Form: React.FC = () => {
         await videoRef.current.play();
       }
     } catch (err) {
-      showAlert({ type: 'error', text: 'No se pudo activar la cámara' });
+      const msg = err instanceof Error ? err.message : '';
+      let userMsg = '⚠️ No se pudo activar la cámara.\n';
+      if (msg.toLowerCase().includes('permission') || msg.toLowerCase().includes('denied')) {
+        userMsg += '📌 Haz CLICK en el 🔒 CANDELADO (arriba-izq antes de la URL) → Permitir CÁMARA → Actualiza la página (F5).';
+      } else if (msg.toLowerCase().includes('not found') || msg.toLowerCase().includes('device')) {
+        userMsg += '📌 Tu dispositivo no tiene cámara o está siendo usada por otra app (Zoom, Meet).';
+      } else {
+        userMsg += '📌 Usa el candado 🔒 arriba-izq para PERMITIR la CÁMARA, luego actualiza (F5).\nSi no puedes usar la cámara: puedes INICIAR SESIÓN sin foto (solo email y contraseña).';
+      }
+      showAlert({ type: 'error', text: userMsg });
     }
   };
 
@@ -133,8 +147,7 @@ const Form: React.FC = () => {
     }
 
     if (photoDataUrl === '') {
-      showAlert({ type: 'error', text: 'Por favor, toma una foto para validar' });
-      return;
+      showAlert({ type: 'warning', text: '💡 Iniciando sesión SIN reconocimiento facial. (Recomendamos activar la cámara para mayor seguridad con el 🔒 candado arriba.)' });
     }
 
     setLoading(true);
@@ -145,7 +158,7 @@ const Form: React.FC = () => {
       postData: {
         email: formValues.email,
         password: formValues.password,
-        photo: photoDataUrl,
+        photo: photoDataUrl !== '' ? photoDataUrl : null,
       },
     };
 
@@ -169,7 +182,7 @@ const Form: React.FC = () => {
       login(userData);
 
       showAlert({ type: 'success', text: 'Inicio de sesión exitoso' });
-      
+
       // Redirigir a la página principal después de un breve delay
       setTimeout(() => {
         router.push('/');
@@ -247,7 +260,11 @@ const Form: React.FC = () => {
               required
               onChange={handleChange}
             />
-            {errors.email && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.email}</span>}
+            {errors.email && (
+              <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                {errors.email}
+              </span>
+            )}
           </div>
         </div>
         <div className='form-line'>
@@ -266,7 +283,11 @@ const Form: React.FC = () => {
             required
             onChange={handleChange}
           />
-          {errors.password && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.password}</span>}
+          {errors.password && (
+            <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+              {errors.password}
+            </span>
+          )}
         </div>
         <div className='form-line'>
           <div className='label-line'>
@@ -281,8 +302,12 @@ const Form: React.FC = () => {
             />
           </div>
           <div className='one-line'>
-            <button type='button' className='button gray-overlay' onClick={startCamera}>Activar cámara</button>
-            <button type='button' className='button blue-filled' onClick={takePhoto}>Tomar foto</button>
+            <button type='button' className='button gray-overlay' onClick={startCamera}>
+              Activar cámara
+            </button>
+            <button type='button' className='button blue-filled' onClick={takePhoto}>
+              Tomar foto
+            </button>
           </div>
           {photoDataUrl !== '' && (
             <CapturedPhoto image={photoDataUrl} size='large' alt='Foto para verificación' />
