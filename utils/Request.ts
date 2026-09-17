@@ -33,7 +33,13 @@ const createAuth = base64.encode(`${auth.username}:${auth.password}`);
  * @return {string} The base URL for API requests.
  */
 const buildUrl = (): string => {
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000';
+  const fromBackend = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const fromApi = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const hardcodedFallback = 'https://backend-m5yd.onrender.com';
+  let base: string = (fromBackend ?? fromApi ?? hardcodedFallback).trim();
+  if (base.endsWith('/')) {
+    base = base.slice(0, -1);
+  }
   return base;
 };
 
@@ -58,7 +64,9 @@ const parseResults = (value: string): any => {
 const getResponse = async (parameters: IRequest): Promise<IResponse> => {
   let response: AxiosResponse<any, any>;
 
-  const url = `${buildUrl()}/${parameters.url}`;
+  const url = parameters.url.startsWith('http')
+    ? parameters.url
+    : `${buildUrl()}/${parameters.url.replace(/^\//, '')}`;
 
   const headers = { Authorization: `Basic ${createAuth}` };
 
@@ -85,7 +93,8 @@ const getResponse = async (parameters: IRequest): Promise<IResponse> => {
       const serverData = (err.response as any)?.data ?? null;
 
       const parsedResults = serverData ?? (responseText ? parseResults(responseText) : {});
-      const normalizedTitle = (parsedResults as any)?.title ?? (parsedResults as any)?.detail ?? err.message;
+      const normalizedTitle =
+        (parsedResults as any)?.title ?? (parsedResults as any)?.detail ?? err.message;
 
       const d: IResponse = {
         data: { ...(parsedResults as any), title: normalizedTitle },
