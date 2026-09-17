@@ -1,12 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "frameworkVersion": "15",
   "installCommand": "npm install --no-audit --no-fund --prefer-offline",
   "buildCommand": "next build",
   "outputDirectory": ".next",
   "devCommand": "next dev",
-  "nodeVersion": "20.x",
 
   "headers": [
     {
