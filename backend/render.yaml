@@ -1,0 +1,76 @@
+# ==========================================================
+#  RENDER.BLUEPRINT.YAML - QRTIX BACKEND FastAPI
+# ==========================================================
+#  🚨 CORREGIDO v2: Build OK sin Rust, sin source compile.
+#  FIX aplicado: PYTHON_VERSION 3.12.8 OBLIGATORIO (NO 3.13/3.14)
+#  y Build Command pip con --only-binary=:all: para 100% wheels.
+# ==========================================================
+
+services:
+  - type: web
+    name: qrtix-backend
+    runtime: python
+    region: virginia
+    plan: starter
+    branch: main
+
+    rootDir: backend
+
+    # ==============================================================
+    #  BUILD COMMAND - NUNCA compila fuentes Rust/C/C++
+    # ==============================================================
+    buildCommand: |
+      pip install --upgrade pip setuptools wheel
+      pip install --no-cache-dir --only-binary=:all: --find-links https://download.pytorch.org/whl/cpu -r requirements.txt || \
+      pip install --no-cache-dir --prefer-binary -r requirements.txt
+
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1"
+
+    healthCheckPath: /health
+    healthCheckTimeout: 300
+
+    autoDeploy: true
+
+    envVars:
+      # ============================================================
+      #  🚨 VERSIÓN PYTHON OBLIGATORIA (NO QUITAR / NO CAMBIAR)
+      #  Py 3.13+ NO TIENE wheels precompilados para numpy/scipy/pydantic_core.
+      # ============================================================
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+
+      - key: PORT
+        value: "10000"
+
+      # Render usa NIXPACKS: evita compilar desde fuentes
+      - key: NIXPACKS_NO_SOURCE_BUILD
+        value: "1"
+      - key: PIP_ONLY_BINARY
+        value: ":all:"
+      - key: PIP_PREFER_BINARY
+        value: "true"
+      - key: CARGO_NET_OFFLINE
+        value: "true"
+
+      - key: MONGO_URI
+        sync: false
+        value: "mongodb+srv://angelgutierrezrobayo935:M423i32R4@cluster0.abwxf0v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+      - key: DB_NAME
+        value: qrtixpro
+      - key: COLLECTION_NAME
+        value: usuarios
+      - key: SALES_COLLECTION
+        value: ventas
+      - key: RESERVATIONS_COLLECTION
+        value: seat_reservations
+      - key: LOGS_COLLECTION
+        value: logs
+
+      - key: RESERVATION_MINUTES
+        value: "15"
+      - key: FACE_RECOGNITION_THRESHOLD
+        value: "0.50"
+
+      - key: CORS_ORIGIN_REGEX
+        value: ".*"

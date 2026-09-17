@@ -1,0 +1,47 @@
+{
+  "name": "tsapp",
+  "version": "0.1.22",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "eslint": "eslint ./app",
+    "prettier": "prettier --check **",
+    "prettier fix": "prettier --write **"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0",
+    "axios": "^1.11.0",
+    "base-64": "^1.0.0",
+    "face-api.js": "^0.22.2",
+    "mongodb": "^6.3.0",
+    "next": "^15.4.5",
+    "pdfkit": "^0.15.0",
+    "qrcode": "^1.5.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@next/eslint-plugin-next": "^15.4.5",
+    "@types/base-64": "^1.0.2",
+    "@types/node": "^24.1.0",
+    "@types/pdfkit": "^0.13.4",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.32.0",
+    "eslint-config-next": "^15.4.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.5.3",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3"
+  }
+}
