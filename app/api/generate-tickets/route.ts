@@ -27,16 +27,12 @@ interface TicketData {
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const FONTS: Record<string, { normal: Buffer | string; bold?: Buffer | string; italics?: Buffer | string; bolditalics?: Buffer | string }> = {
-  Roboto: {
-    normal:
-      'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.18/fonts/Roboto-Regular.ttf',
-    bold:
-      'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.18/fonts/Roboto-Medium.ttf',
-    italics:
-      'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.18/fonts/Roboto-Italic.ttf',
-    bolditalics:
-      'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.18/fonts/Roboto-MediumItalic.ttf',
+const PDF_STANDARD_FONTS: Record<string, any> = {
+  Helvetica: {
+    normal: 'Helvetica',
+    bold: 'Helvetica-Bold',
+    italics: 'Helvetica-Oblique',
+    bolditalics: 'Helvetica-BoldOblique',
   },
 };
 
@@ -94,9 +90,9 @@ export async function POST(request: NextRequest) {
       `[generate-tickets-pdfmake] Generando PDF con ${seats.length} boleta(s)...`
     );
 
-    const printer = new PdfPrinter(FONTS);
+    const printer = new PdfPrinter(PDF_STANDARD_FONTS);
 
-    const ticketPages: any[] = [];
+    const pagesContent: any[] = [];
 
     for (let i = 0; i < seats.length; i++) {
       const s = seats[i];
@@ -144,7 +140,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const qrCol = qrImageBase64
+      const qrCol: any[] = qrImageBase64
         ? [
             {
               image: qrImageBase64,
@@ -246,14 +242,22 @@ export async function POST(request: NextRequest) {
         },
         {
           canvas: [
-            { type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, lineColor: '#cbd5e1' },
+            {
+              type: 'line',
+              x1: 0,
+              y1: 0,
+              x2: 515,
+              y2: 0,
+              lineWidth: 0.5,
+              lineColor: '#cbd5e1',
+            },
           ],
           margin: [0, 0, 0, 10],
         },
         {
           stack: [
             {
-              text: '🎭   EVENTO',
+              text: 'EVENTO',
               fontSize: 15,
               bold: true,
               color: BRAND_BLUE,
@@ -281,14 +285,22 @@ export async function POST(request: NextRequest) {
         },
         {
           canvas: [
-            { type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, lineColor: '#cbd5e1' },
+            {
+              type: 'line',
+              x1: 0,
+              y1: 0,
+              x2: 515,
+              y2: 0,
+              lineWidth: 0.5,
+              lineColor: '#cbd5e1',
+            },
           ],
           margin: [0, 0, 0, 10],
         },
         {
           stack: [
             {
-              text: '🎫   INFORMACIÓN DEL ASIENTO',
+              text: 'INFORMACIÓN DEL ASIENTO',
               fontSize: 15,
               bold: true,
               color: BRAND_ORANGE,
@@ -299,7 +311,12 @@ export async function POST(request: NextRequest) {
                 {
                   width: '*',
                   stack: [
-                    { text: 'Zona', fontSize: 9, color: MUTED, margin: [0, 0, 0, 2] },
+                    {
+                      text: 'Zona',
+                      fontSize: 9,
+                      color: MUTED,
+                      margin: [0, 0, 0, 2],
+                    },
                     {
                       text: zone,
                       fontSize: 12,
@@ -311,7 +328,12 @@ export async function POST(request: NextRequest) {
                 {
                   width: '*',
                   stack: [
-                    { text: 'Fila', fontSize: 9, color: MUTED, margin: [0, 0, 0, 2] },
+                    {
+                      text: 'Fila',
+                      fontSize: 9,
+                      color: MUTED,
+                      margin: [0, 0, 0, 2],
+                    },
                     {
                       text: String(row),
                       fontSize: 12,
@@ -323,7 +345,12 @@ export async function POST(request: NextRequest) {
                 {
                   width: '*',
                   stack: [
-                    { text: 'Asiento', fontSize: 9, color: MUTED, margin: [0, 0, 0, 2] },
+                    {
+                      text: 'Asiento',
+                      fontSize: 9,
+                      color: MUTED,
+                      margin: [0, 0, 0, 2],
+                    },
                     {
                       text: String(seatNum),
                       fontSize: 12,
@@ -344,7 +371,7 @@ export async function POST(request: NextRequest) {
               : {},
             totalPrice > 0 && ticketNumber === totalTickets
               ? {
-                  text: `💵  TOTAL COMPRA: $${c(totalPrice)} COP`,
+                  text: `TOTAL COMPRA: $${c(totalPrice)} COP`,
                   fontSize: 13,
                   bold: true,
                   color: BRAND_GREEN,
@@ -356,14 +383,22 @@ export async function POST(request: NextRequest) {
         },
         {
           canvas: [
-            { type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, lineColor: '#cbd5e1' },
+            {
+              type: 'line',
+              x1: 0,
+              y1: 0,
+              x2: 515,
+              y2: 0,
+              lineWidth: 0.5,
+              lineColor: '#cbd5e1',
+            },
           ],
           margin: [0, 0, 0, 10],
         },
         {
           stack: [
             {
-              text: '👤   TITULAR DE LA BOLETA',
+              text: 'TITULAR DE LA BOLETA',
               fontSize: 15,
               bold: true,
               color: BRAND_PURPLE,
@@ -405,7 +440,15 @@ export async function POST(request: NextRequest) {
         },
         {
           canvas: [
-            { type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, lineColor: '#cbd5e1' },
+            {
+              type: 'line',
+              x1: 0,
+              y1: 0,
+              x2: 515,
+              y2: 0,
+              lineWidth: 0.5,
+              lineColor: '#cbd5e1',
+            },
           ],
           margin: [0, 0, 0, 12],
         },
@@ -427,7 +470,7 @@ export async function POST(request: NextRequest) {
                 },
                 {
                   text:
-                    '✨  Esta boleta es intransferible y válida únicamente para la fecha y evento indicados.',
+                    'Esta boleta es intransferible y válida únicamente para la fecha y evento indicados.',
                   fontSize: 10,
                   color: BRAND_DARK,
                   margin: [12, 0, 0, 5],
@@ -435,7 +478,7 @@ export async function POST(request: NextRequest) {
                 },
                 {
                   text:
-                    '✅  Presente esta boleta IMPRESA o DIGITAL + su documento de identidad ORIGINAL a la entrada.',
+                    'Presente esta boleta IMPRESA o DIGITAL + su documento de identidad ORIGINAL a la entrada.',
                   fontSize: 10,
                   color: BRAND_DARK,
                   margin: [12, 0, 0, 5],
@@ -443,7 +486,7 @@ export async function POST(request: NextRequest) {
                 },
                 {
                   text:
-                    '🚫  No se aceptan copias ni modificaciones. Cualquier alteración anula la boleta automáticamente.',
+                    'No se aceptan copias ni modificaciones. Cualquier alteración anula la boleta automáticamente.',
                   fontSize: 10,
                   color: BRAND_DARK,
                   margin: [12, 0, 0, 0],
@@ -456,102 +499,62 @@ export async function POST(request: NextRequest) {
         },
       ];
 
-      ticketPages.push({
-        pageSize: 'LETTER',
-        pageMargins: [24, 24, 24, 80],
-        content: pageBody,
-        footer: (currentPage: number, pageCount: number) => ({
-          stack: [
-            {
-              canvas: [
-                {
-                  type: 'line',
-                  x1: 0,
-                  y1: 0,
-                  x2: 547,
-                  y2: 0,
-                  lineWidth: 0.5,
-                  lineColor: '#cbd5e1',
-                },
-              ],
-              margin: [24, 0, 24, 6],
-            },
-            {
-              text: '🎟️  QRTixPro - Plataforma oficial de venta y gestión de boletas digitales.',
-              fontSize: 10,
-              color: '#475569',
-              alignment: 'center',
-            },
-            {
-              text: 'Conserve este comprobante. Para soporte contáctese con el organizador del evento.',
-              fontSize: 9,
-              color: MUTED,
-              alignment: 'center',
-              margin: [0, 4, 0, 0],
-            },
-            {
-              text: `Válido hasta agotar existencia. © ${new Date().getFullYear()} QRTixPro - Todos los derechos reservados.  -  Pág ${currentPage} de ${pageCount}`,
-              fontSize: 8,
-              color: MUTED,
-              alignment: 'center',
-              margin: [0, 4, 0, 0],
-            },
-          ],
-        }),
-      });
+      if (i > 0) {
+        pagesContent.push({ text: '', pageBreak: 'before' });
+      }
+      pagesContent.push(...pageBody);
     }
 
-    const docDefinition: any =
-      ticketPages.length === 1
-        ? ticketPages[0]
-        : {
-            pageSize: 'LETTER',
-            pageMargins: [24, 24, 24, 80],
-            content: ticketPages.map((p) => ({
-              stack: p.content,
-              pageBreak: 'after',
-            })),
-            footer: (currentPage: number, pageCount: number) => ({
-              stack: [
-                {
-                  canvas: [
-                    {
-                      type: 'line',
-                      x1: 0,
-                      y1: 0,
-                      x2: 547,
-                      y2: 0,
-                      lineWidth: 0.5,
-                      lineColor: '#cbd5e1',
-                    },
-                  ],
-                  margin: [24, 0, 24, 6],
-                },
-                {
-                  text: '🎟️  QRTixPro - Plataforma oficial de venta y gestión de boletas digitales.',
-                  fontSize: 10,
-                  color: '#475569',
-                  alignment: 'center',
-                },
-                {
-                  text: 'Conserve este comprobante. Para soporte contáctese con el organizador del evento.',
-                  fontSize: 9,
-                  color: MUTED,
-                  alignment: 'center',
-                  margin: [0, 4, 0, 0],
-                },
-                {
-                  text: `Válido hasta agotar existencia. © ${new Date().getFullYear()} QRTixPro - Todos los derechos reservados.  -  Pág ${currentPage} de ${pageCount}`,
-                  fontSize: 8,
-                  color: MUTED,
-                  alignment: 'center',
-                  margin: [0, 4, 0, 0],
-                },
-              ],
-            }),
-          };
+    const docDefinition: any = {
+      pageSize: 'LETTER',
+      pageMargins: [24, 24, 24, 80],
+      defaultStyle: {
+        font: 'Helvetica',
+        fontSize: 11,
+        color: BRAND_DARK,
+      },
+      content: pagesContent,
+      footer: (currentPage: number, pageCount: number) => ({
+        stack: [
+          {
+            canvas: [
+              {
+                type: 'line',
+                x1: 0,
+                y1: 0,
+                x2: 547,
+                y2: 0,
+                lineWidth: 0.5,
+                lineColor: '#cbd5e1',
+              },
+            ],
+            margin: [24, 0, 24, 6],
+          },
+          {
+            text: 'QRTixPro - Plataforma oficial de venta y gestión de boletas digitales.',
+            fontSize: 10,
+            color: '#475569',
+            alignment: 'center',
+          },
+          {
+            text: 'Conserve este comprobante. Para soporte contáctese con el organizador del evento.',
+            fontSize: 9,
+            color: MUTED,
+            alignment: 'center',
+            margin: [0, 4, 0, 0],
+          },
+          {
+            text: `Válido hasta agotar existencia. © ${new Date().getFullYear()} QRTixPro - Todos los derechos reservados.  -  Pág ${currentPage} de ${pageCount}`,
+            fontSize: 8,
+            color: MUTED,
+            alignment: 'center',
+            margin: [0, 4, 0, 0],
+          },
+        ],
+      }),
+    };
 
-    const pdfDoc = printer.createPdfKitDocument(docDefinition, {});
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
     const chunks: Buffer[] = [];
 
     const pdfBuffer: Buffer = await new Promise((resolve, reject) => {
@@ -594,11 +597,15 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,
         'Content-Length': String(pdfBuffer.length),
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Cache-Control':
+          'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
       },
     });
   } catch (error: any) {
-    console.error('[generate-tickets-pdfmake] ERROR CRÍTICO:', error?.message ?? error);
+    console.error(
+      '[generate-tickets-pdfmake] ERROR CRÍTICO:',
+      error?.message ?? error
+    );
     if (error?.stack) {
       console.error('[generate-tickets-pdfmake] STACK:', error.stack);
     }
