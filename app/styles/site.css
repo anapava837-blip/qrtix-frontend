@@ -15,10 +15,18 @@
   margin: 0;
 }
 
-.section-title.blue { color: var(--blue); }
-.section-title.red { color: var(--red); }
-.section-title.orange { color: var(--orange); }
-.section-title.purple { color: var(--purple); }
+.section-title.blue {
+  color: var(--blue);
+}
+.section-title.red {
+  color: var(--red);
+}
+.section-title.orange {
+  color: var(--orange);
+}
+.section-title.purple {
+  color: var(--purple);
+}
 
 .view-all {
   color: var(--gray);
@@ -142,8 +150,12 @@ body {
 }
 
 .hero-overlay {
-  background:
-    linear-gradient(120deg, rgba(15, 23, 42, 0.78) 0%, rgba(30, 58, 138, 0.58) 55%, rgba(79, 70, 229, 0.45) 100%);
+  background: linear-gradient(
+    120deg,
+    rgba(15, 23, 42, 0.78) 0%,
+    rgba(30, 58, 138, 0.58) 55%,
+    rgba(79, 70, 229, 0.45) 100%
+  );
   width: 100%;
   height: 100%;
   padding: 100px 0 120px 0;
@@ -151,7 +163,7 @@ body {
 }
 
 .hero-overlay::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background-image:
@@ -170,7 +182,7 @@ body {
   font-size: 1.35rem;
   margin-bottom: 32px;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.90);
+  color: rgba(255, 255, 255, 0.9);
   letter-spacing: 0.005em;
 }
 
@@ -201,19 +213,21 @@ body {
   margin: 30px 0;
 }
 
-.feature-box, .contact-box {
+.feature-box,
+.contact-box {
   background: #fff;
   border-radius: 10px;
   padding: 25px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   height: 100%;
 }
 
-.feature-icon, .contact-icon {
+.feature-icon,
+.contact-icon {
   margin-bottom: 15px;
 }
 
-.feature-icon .material-symbols-outlined, 
+.feature-icon .material-symbols-outlined,
 .contact-icon .material-symbols-outlined {
   font-size: 40px;
   color: #1976d2;
@@ -261,7 +275,7 @@ body {
   border-radius: 10px;
   padding: 30px;
   margin: 30px 0;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .cta-buttons {
@@ -302,12 +316,12 @@ body {
   font-weight: bold;
   text-decoration: none;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .category-pill:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .category-pill.blue {
@@ -431,7 +445,9 @@ header .container .logo button {
   background-color: var(--ink-50);
   border: 1px solid var(--ink-100);
   border-radius: var(--r-md);
-  transition: background-color 140ms ease-out, color 140ms ease-out;
+  transition:
+    background-color 140ms ease-out,
+    color 140ms ease-out;
 }
 header .container .logo button:hover {
   background-color: var(--ink-100);
@@ -459,11 +475,13 @@ header .container .links a {
   color: var(--ink-700);
   display: inline-flex;
   align-items: center;
-  transition: color 140ms ease-out, background-color 140ms ease-out;
+  transition:
+    color 140ms ease-out,
+    background-color 140ms ease-out;
 }
 
 header .container .links a::after {
-  content: "";
+  content: '';
   position: absolute;
   left: 14px;
   right: 14px;
@@ -473,7 +491,7 @@ header .container .links a::after {
   transform-origin: left center;
   border-radius: 2px;
   background: linear-gradient(90deg, var(--brand), var(--purple));
-  transition: transform 200ms cubic-bezier(.2,.6,.3,1);
+  transition: transform 200ms cubic-bezier(0.2, 0.6, 0.3, 1);
 }
 
 header .container .links a:hover {
@@ -510,7 +528,9 @@ header .container .members > a:not(.button) {
   padding: 8px 12px;
   color: var(--ink-700);
   border-radius: var(--r-md);
-  transition: background-color 140ms ease-out, color 140ms ease-out;
+  transition:
+    background-color 140ms ease-out,
+    color 140ms ease-out;
 }
 header .container .members > a:not(.button):hover {
   background-color: var(--ink-50);
@@ -529,7 +549,9 @@ header .container .members .menu-opener {
   padding: 8px 12px;
   color: var(--ink-700);
   border-radius: var(--r-md);
-  transition: background-color 140ms ease-out, color 140ms ease-out;
+  transition:
+    background-color 140ms ease-out,
+    color 140ms ease-out;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1826,5 +1848,318 @@ td {
   header .container .logo,
   header .container .members {
     width: unset;
+  }
+}
+
+/* ============================================================
+   📱 MOBILE RESPONSIVE QRTixsPro < 800px (Celulares + Tablets)
+   ============================================================ */
+@media (max-width: 800px) {
+  /* === TIPOGRAFÍA GLOBAL MÓVIL === */
+  html,
+  body,
+  input,
+  select,
+  textarea,
+  button,
+  p,
+  span,
+  div,
+  i,
+  em,
+  img,
+  table,
+  tr,
+  th,
+  td,
+  strong,
+  a,
+  ul,
+  li,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  nav,
+  header,
+  footer,
+  section {
+    font-size: 1.02rem;
+  }
+
+  h1 {
+    font-size: 1.9em !important;
+    line-height: 1.2 !important;
+  }
+  h2 {
+    font-size: 1.55em !important;
+    line-height: 1.25 !important;
+  }
+  h3 {
+    font-size: 1.25em !important;
+  }
+
+  /* === HERO SECTION MÓVIL === */
+  .hero-section {
+    min-height: auto !important;
+  }
+  .hero-overlay {
+    padding: 60px 0 80px 0 !important;
+  }
+  .hero-content {
+    padding: 10px 10px 30px 10px !important;
+  }
+  .hero-subtitle {
+    font-size: 1.05rem !important;
+    margin-bottom: 24px !important;
+  }
+
+  /* === TOP SEARCH BAR MÓVIL === */
+  .top-search {
+    padding: 10px !important;
+    border-radius: var(--r-lg) !important;
+  }
+
+  /* === HEADER / NAV MÓVIL === */
+  header {
+    position: sticky !important;
+  }
+  header .container {
+    height: auto !important;
+    padding: 10px 14px !important;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  header .container .logo {
+    width: auto !important;
+    min-width: 160px;
+  }
+  header .container .logo svg {
+    width: 70px !important;
+  }
+
+  /* IMPORTANTE: OCULTAR LINKS DE NAV EN MÓVIL (no hay hamburguesa JS) */
+  header .container .links {
+    display: none !important;
+  }
+
+  header .container .members {
+    width: auto !important;
+    gap: 8px;
+  }
+  header .container .members a.button,
+  header .container .members button {
+    padding: 8px 14px !important;
+    font-size: 0.92em !important;
+  }
+  header .container .members span:not(.material-symbols-outlined) {
+    display: none;
+  }
+  header .container .members .menu-opener span {
+    display: inline !important;
+  }
+
+  /* === DROPDOWN MÓVIL === */
+  header .container .dropdown {
+    top: 70px !important;
+    right: 8px !important;
+    left: 8px !important;
+    min-width: unset !important;
+    width: calc(100% - 16px);
+  }
+
+  /* === FOOTER MÓVIL === */
+  footer {
+    padding: 40px 0 20px 0 !important;
+  }
+  footer .newsletter {
+    width: 100% !important;
+    padding: 0 10px;
+  }
+  footer .newsletter h4 {
+    font-size: 1.1em !important;
+  }
+  footer .newsletter .input-container {
+    flex-direction: column !important;
+    gap: 10px;
+  }
+  footer .newsletter .input-container input {
+    border-radius: var(--r-md) !important;
+    height: 50px !important;
+    padding: 0 16px !important;
+    width: 100% !important;
+  }
+  footer .newsletter .input-container button {
+    width: 100% !important;
+    border-radius: var(--r-md) !important;
+    padding: 12px 18px !important;
+    border-top-left-radius: var(--r-md) !important;
+    border-bottom-left-radius: var(--r-md) !important;
+  }
+
+  /* === CARD GRID / EVENTOS MÓVIL: 1 COLUMNA === */
+  .card-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    padding: 0 8px;
+  }
+
+  /* === HORIZONTAL SCROLL MÓVIL === */
+  .horizontal-scroll-wrapper {
+    gap: 12px !important;
+  }
+  .horizontal-card-item {
+    min-width: 250px !important;
+  }
+
+  /* === CATEGORY PILLS MÓVIL: ENVOLVER === */
+  .event-categories {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    padding: 0 10px;
+  }
+  .category-pill {
+    padding: 6px 16px !important;
+    font-size: 0.92em !important;
+  }
+
+  /* === SECTION PADDING MÓVIL === */
+  section {
+    padding: 16px 0 !important;
+  }
+  .section-header {
+    padding: 0 12px;
+    margin-bottom: 1rem !important;
+  }
+  .section-title {
+    font-size: 1.25rem !important;
+  }
+
+  /* === BOTONES GLOBALES MÓVIL: ANCHO 100% === */
+  .button,
+  button.button,
+  a.button {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px 18px !important;
+    font-size: 1em !important;
+    white-space: normal !important;
+  }
+  .form-buttons .button {
+    width: 100% !important;
+  }
+
+  /* === INPUTS + FORMS MÓVIL === */
+  input,
+  select,
+  textarea {
+    padding: 11px 12px !important;
+    font-size: 1em !important;
+  }
+  .form.shrink,
+  .form-information {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 10px !important;
+    margin: 0 !important;
+  }
+  .form .form-elements {
+    padding: 0 !important;
+  }
+  .form .form-elements .form-line {
+    margin-bottom: 16px !important;
+  }
+  .form .form-elements .form-line .label-line {
+    margin-bottom: 8px !important;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .form .form-elements .form-line .label-line label {
+    font-size: 0.95em !important;
+  }
+  .form .form-elements .form-line .two-line {
+    width: 100% !important;
+    flex-direction: column !important;
+  }
+  .form .form-elements .form-line .two-line:first-child,
+  .form .form-elements .form-line .two-line:last-child {
+    padding: 0 !important;
+    margin-bottom: 14px !important;
+  }
+
+  /* === GOOGLE BUTTON CUSTOM (Signin/Signup) === */
+  .google-button {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    font-size: 0.98em !important;
+  }
+
+  /* === PAGE WRAPPERS MÓVIL === */
+  .page,
+  .page-main,
+  .max-width-1000,
+  .max-width-1200,
+  .max-width-1400,
+  .max-width-1600 {
+    padding: 0 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* === CTA BUTTONS HERO MÓVIL === */
+  .cta-buttons {
+    gap: 8px !important;
+  }
+
+  /* === OR LINE (divisor google / email) === */
+  .or-line {
+    margin: 18px 0 !important;
+  }
+}
+
+/* ============================================================
+   📱 EXTRA PEQUEÑO < 500px (Celulares chicos ej: iPhone SE)
+   ============================================================ */
+@media (max-width: 500px) {
+  html,
+  body,
+  input,
+  select,
+  textarea,
+  button,
+  p,
+  span,
+  div {
+    font-size: 0.98rem !important;
+  }
+
+  h1 {
+    font-size: 1.65em !important;
+  }
+  h2 {
+    font-size: 1.35em !important;
+  }
+
+  .hero-overlay {
+    padding: 50px 0 70px 0 !important;
+  }
+
+  header .container {
+    padding: 8px 10px !important;
+  }
+
+  .card-grid {
+    gap: 14px !important;
+    padding: 0 4px !important;
+  }
+
+  .form.shrink {
+    padding: 0 6px !important;
+  }
+
+  footer .newsletter {
+    padding: 0 6px !important;
   }
 }

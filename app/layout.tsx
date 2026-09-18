@@ -22,9 +22,14 @@ const description = 'Modern ticketing is a modern ticketing solution';
 
 export const viewport: Viewport = {
   width: 'device-width',
-  themeColor: '#ffffff',
+  themeColor: '#2563eb',
   initialScale: 1,
+  maximumScale: 5,
+  minimumScale: 1,
+  userScalable: true,
+  viewportFit: 'cover',
 };
+
 
 export const metadata: Metadata = {
   title,
