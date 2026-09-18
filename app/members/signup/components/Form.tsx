@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 
 import Link from 'next/link';
 
@@ -13,7 +13,6 @@ import Input from '@components/Form/Input';
 import Switch from '@components/Form/Switch';
 import Button from '@components/Button/Button';
 import Loader from '@components/Loader/Loader';
-import CapturedPhoto from '@components/Profile/CapturedPhoto';
 
 // utils
 import Request, { type IRequest, type IResponse } from '@utils/Request';
@@ -33,90 +32,6 @@ const Form: React.FC = () => {
   const { showAlert, hideAlert } = useAlert();
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [cameraActive, setCameraActive] = useState<boolean>(false);
-  const [photoDataUrl, setPhotoDataUrl] = useState<string>('');
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-
-  // Validaciones
-  const { errors, validateForm, validateSingleField, clearFieldError } = useFormValidation({
-    ...commonValidationRules.signup,
-    tos: {
-      custom: (value: string) => {
-        // Para el checkbox, verificamos si está marcado
-        return formValues.tos ? null : 'Debe aceptar los términos y condiciones';
-      },
-    },
-  });
-
-  useEffect(() => {
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
-      }
-    };
-  }, []);
-
-  /**
-   * Activa la cámara del dispositivo.
-   */
-  const startCamera = async (): Promise<void> => {
-    try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Tu navegador no permite acceso a la cámara o no estás en HTTPS.');
-      }
-      // Solicitar cámara con mayor resolución para mejor detección facial
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'user', // Cámara frontal
-        },
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : '';
-      let userMsg = '⚠️ No se pudo activar la cámara.\n';
-      if (msg.toLowerCase().includes('permission') || msg.toLowerCase().includes('denied')) {
-        userMsg += '📌 Haz CLICK en el 🔒 CANDELADO (arriba-izq antes de la URL) → Permitir CÁMARA → Actualiza la página (F5).';
-      } else if (msg.toLowerCase().includes('not found') || msg.toLowerCase().includes('device')) {
-        userMsg += '📌 Tu dispositivo no tiene cámara o está siendo usada por otra app (Zoom, Meet).';
-      } else {
-        userMsg += '📌 Usa el candado 🔒 arriba-izq para PERMITIR la CÁMARA, luego actualiza (F5).\nSi no puedes usar la cámara: puedes REGISTRARTE sin foto (luego la subes/activas en tu perfil).';
-      }
-      showAlert({ type: 'error', text: userMsg });
-    }
-  };
-
-  /**
-   * Captura una foto desde el stream de video.
-   */
-  const takePhoto = (): void => {
-    const video = videoRef.current;
-    if (!video) {
-      showAlert({ type: 'error', text: 'Cámara no disponible' });
-      return;
-    }
-    const canvas = document.createElement('canvas');
-    // Usar resolución más alta para mejor detección
-    canvas.width = video.videoWidth || 800;
-    canvas.height = video.videoHeight || 600;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      // Mejorar la calidad de la imagen
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      // Usar JPEG con alta calidad para mejor compresión y detección
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-      setPhotoDataUrl(dataUrl);
-    }
-  };
 
   const [formValues, setFormValues] = useState<IFormProps>({
     name: '',
@@ -128,13 +43,15 @@ const Form: React.FC = () => {
     tos: false,
   });
 
-  /**
-   * Handles the change event for input fields in the form.
-   *
-   * This function is called when the value of an input field in the form changes. It updates the state of the form values with the new value.
-   *
-   * @param {React.ChangeEvent<HTMLInputElement>} e - The change event.
-   */
+  const { errors, validateForm, validateSingleField, clearFieldError } = useFormValidation({
+    ...commonValidationRules.signup,
+    tos: {
+      custom: (value: string) => {
+        return formValues.tos ? null : 'Debe aceptar los términos y condiciones';
+      },
+    },
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
 
@@ -143,7 +60,6 @@ const Form: React.FC = () => {
       [name]: value,
     });
 
-    // Validar el campo cuando el usuario escribe
     if (value.trim() !== '') {
       validateSingleField(name, value, { ...formValues, [name]: value });
     } else {
@@ -151,13 +67,6 @@ const Form: React.FC = () => {
     }
   };
 
-  /**
-   * Handles the change event for checkbox fields in the form.
-   *
-   * This function is called when the value of a checkbox field in the form changes. It updates the state of the form values with the new value.
-   *
-   * @param {React.ChangeEvent<HTMLInputElement>} e - The change event.
-   */
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, checked } = e.target;
 
@@ -166,7 +75,6 @@ const Form: React.FC = () => {
       [name]: checked,
     });
 
-    // Validar el checkbox
     if (name === 'tos') {
       if (checked) {
         clearFieldError('tos');
@@ -174,29 +82,12 @@ const Form: React.FC = () => {
     }
   };
 
-  /**
-   * Handles the form submission event.
-   *
-   * This function is called when the form is submitted. It prevents the default form submission behavior,
-   * hides any existing alert, sets the loading state to true, sends a POST request to the signin/password endpoint,
-   * and handles the response. If the response status is 200, it redirects the user to the account activation page.
-   * If the status is not 200, it shows an error alert. Finally, it sets the loading state back to false.
-   *
-   * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
-   * @returns {Promise<any>} A promise that resolves when the request is complete.
-   */
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<any> => {
     e.preventDefault();
 
     hideAlert();
 
-    // Validar el formulario antes de enviar
     const isValid = validateForm(formValues);
-
-    // La foto AHORA ES OPCIONAL (no bloquea el registro)
-    if (photoDataUrl === '') {
-      showAlert({ type: 'warning', text: '💡 Registrándote SIN reconocimiento facial. (Recomendamos activar la cámara con el 🔒 candado arriba para mayor seguridad).' });
-    }
 
     if (!isValid) {
       showAlert({ type: 'error', text: 'Por favor, corrija los errores en el formulario' });
@@ -215,7 +106,6 @@ const Form: React.FC = () => {
         telefono: formValues.telefono,
         email: formValues.email,
         password: formValues.password,
-        photo: photoDataUrl !== '' ? photoDataUrl : null,
         tos: formValues.tos,
       },
     };
@@ -426,32 +316,6 @@ const Form: React.FC = () => {
             <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
               {errors.tos}
             </span>
-          )}
-        </div>
-
-        {/* Sección de Cámara */}
-        <div className='form-line'>
-          <div className='label-line'>
-            <label htmlFor='photo'>Foto</label>
-          </div>
-          <div className='upload-picture'>
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              style={{ width: '100%', display: 'block', borderRadius: '8px' }}
-            />
-          </div>
-          <div className='one-line'>
-            <button type='button' className='button gray-overlay' onClick={startCamera}>
-              Activar cámara
-            </button>
-            <button type='button' className='button blue-filled' onClick={takePhoto}>
-              Tomar foto
-            </button>
-          </div>
-          {photoDataUrl !== '' && (
-            <CapturedPhoto image={photoDataUrl} size='large' alt='Foto para verificación' />
           )}
         </div>
 

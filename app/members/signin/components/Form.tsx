@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -14,7 +14,6 @@ import { useFormValidation, commonValidationRules } from '@hooks/useFormValidati
 import Input from '@components/Form/Input';
 import Button from '@components/Button/Button';
 import Loader from '@components/Loader/Loader';
-import CapturedPhoto from '@components/Profile/CapturedPhoto';
 
 // utils
 import Request, { type IRequest, type IResponse } from '@utils/Request';
@@ -35,82 +34,11 @@ const Form: React.FC = () => {
     email: '',
     password: '',
   });
-  const [photoDataUrl, setPhotoDataUrl] = useState<string>('');
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
 
-  // Validaciones
   const { errors, validateSingleField, validateForm } = useFormValidation(
     commonValidationRules.signin
   );
 
-  /**
-   * Activa la cámara del dispositivo.
-   */
-  const startCamera = async (): Promise<void> => {
-    try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Tu navegador no permite acceso a la cámara o no estás en HTTPS.');
-      }
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : '';
-      let userMsg = '⚠️ No se pudo activar la cámara.\n';
-      if (msg.toLowerCase().includes('permission') || msg.toLowerCase().includes('denied')) {
-        userMsg += '📌 Haz CLICK en el 🔒 CANDELADO (arriba-izq antes de la URL) → Permitir CÁMARA → Actualiza la página (F5).';
-      } else if (msg.toLowerCase().includes('not found') || msg.toLowerCase().includes('device')) {
-        userMsg += '📌 Tu dispositivo no tiene cámara o está siendo usada por otra app (Zoom, Meet).';
-      } else {
-        userMsg += '📌 Usa el candado 🔒 arriba-izq para PERMITIR la CÁMARA, luego actualiza (F5).\nSi no puedes usar la cámara: puedes INICIAR SESIÓN sin foto (solo email y contraseña).';
-      }
-      showAlert({ type: 'error', text: userMsg });
-    }
-  };
-
-  /**
-   * Captura una foto desde el stream de video.
-   */
-  const takePhoto = (): void => {
-    const video = videoRef.current;
-    if (!video) {
-      showAlert({ type: 'error', text: 'Cámara no disponible' });
-      return;
-    }
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/png');
-      setPhotoDataUrl(dataUrl);
-    }
-  };
-
-  /**
-   * Limpia el stream al desmontar.
-   */
-  useEffect(() => {
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
-        streamRef.current = null;
-      }
-    };
-  }, []);
-
-  /**
-   * Handles the change event for input fields in the form.
-   *
-   * This function is called when the value of an input field in the form changes. It updates the state of the form values with the new value.
-   *
-   * @param {React.ChangeEvent<HTMLInputElement>} e - The change event.
-   */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
 
@@ -119,35 +47,18 @@ const Form: React.FC = () => {
       [name]: value,
     });
 
-    // Validar el campo cuando cambie
     validateSingleField(name, value);
   };
 
-  /**
-   * Handles the form submission event.
-   *
-   * This function is called when the form is submitted. It prevents the default form submission behavior,
-   * hides any existing alert, sets the loading state to true, sends a POST request to the signin/login endpoint,
-   * and handles the response. If the response status is 200, it shows a success message. If the status is not 200, it shows an error alert.
-   * Finally, it sets the loading state back to false.
-   *
-   * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
-   * @returns {Promise<any>} A promise that resolves when the request is complete.
-   */
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<any> => {
     e.preventDefault();
 
     hideAlert();
 
-    // Validar formulario antes de enviar
     const isValid = validateForm(formValues);
     if (!isValid) {
       showAlert({ type: 'error', text: 'Por favor, corrige los errores en el formulario' });
       return;
-    }
-
-    if (photoDataUrl === '') {
-      showAlert({ type: 'warning', text: '💡 Iniciando sesión SIN reconocimiento facial. (Recomendamos activar la cámara para mayor seguridad con el 🔒 candado arriba.)' });
     }
 
     setLoading(true);
@@ -158,7 +69,6 @@ const Form: React.FC = () => {
       postData: {
         email: formValues.email,
         password: formValues.password,
-        photo: photoDataUrl !== '' ? photoDataUrl : null,
       },
     };
 
@@ -167,23 +77,20 @@ const Form: React.FC = () => {
     const { status, data } = req;
 
     if (status === 200) {
-      // Crear objeto de usuario con los datos del login exitoso
       const userData = {
         id: data.results?.userId || 'temp-id',
         name: data.results?.name || 'Usuario',
         lastname: data.results?.lastname || '',
         email: formValues.email,
-        photo: photoDataUrl,
+        photo: '',
         cedula: data.results?.cedula || '',
         telefono: data.results?.telefono || '',
       };
 
-      // Guardar datos del usuario en el contexto
       login(userData);
 
       showAlert({ type: 'success', text: 'Inicio de sesión exitoso' });
 
-      // Redirigir a la página principal después de un breve delay
       setTimeout(() => {
         router.push('/');
       }, 1500);
@@ -287,30 +194,6 @@ const Form: React.FC = () => {
             <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
               {errors.password}
             </span>
-          )}
-        </div>
-        <div className='form-line'>
-          <div className='label-line'>
-            <label htmlFor='photo'>Foto</label>
-          </div>
-          <div className='upload-picture'>
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              style={{ width: '100%', display: 'block', borderRadius: '8px' }}
-            />
-          </div>
-          <div className='one-line'>
-            <button type='button' className='button gray-overlay' onClick={startCamera}>
-              Activar cámara
-            </button>
-            <button type='button' className='button blue-filled' onClick={takePhoto}>
-              Tomar foto
-            </button>
-          </div>
-          {photoDataUrl !== '' && (
-            <CapturedPhoto image={photoDataUrl} size='large' alt='Foto para verificación' />
           )}
         </div>
         <div className='form-buttons'>
