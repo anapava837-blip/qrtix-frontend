@@ -18,8 +18,8 @@ const Page: React.FC = () => (
         <div className='center'>
           <Heading type={1} color='gray' text='Comprar Tickets' />
           <p className='gray'>
-            Introduce tus datos personales y de pago. Emitiremos y enviaremos
-            tus entradas a tu correo electrónico de inmediato.
+            Introduce tus datos personales y de pago. Emitiremos y enviaremos tus entradas a tu
+            correo electrónico de inmediato.
           </p>
         </div>
         <div className='padding-top center'>

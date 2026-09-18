@@ -15,9 +15,9 @@ const Page: React.FC = () => (
         <div className='padding-bottom center'>
           <Heading type={1} color='gray' text='Promotores' />
           <p className='gray form-information'>
-            Ya sea que estés vendiendo una entrada o cien mil, la infraestructura de QRTixsPro está diseñada 
-            para satisfacer todas tus necesidades en Colombia. ¡Además, no hay tarifas adicionales ni 
-            sorpresas añadidas más tarde!
+            Ya sea que estés vendiendo una entrada o cien mil, la infraestructura de QRTixsPro está
+            diseñada para satisfacer todas tus necesidades en Colombia. ¡Además, no hay tarifas
+            adicionales ni sorpresas añadidas más tarde!
           </p>
         </div>
       </div>
@@ -28,9 +28,9 @@ const Page: React.FC = () => (
         <div className='center'>
           <Heading type={5} color='gray' text='Gestiona todo con una sola aplicación' />
           <p className='gray form-information'>
-            Con nuestra aplicación especialmente diseñada para Promotores, puedes seguir las ventas de entradas 
-            en tiempo real y admitir clientes en la puerta con tu escáner de código QR. Perfecta para eventos 
-            en Bogotá, Medellín, Cali y todo Colombia. ¡Además, es gratis!
+            Con nuestra aplicación especialmente diseñada para Promotores, puedes seguir las ventas
+            de entradas en tiempo real y admitir clientes en la puerta con tu escáner de código QR.
+            Perfecta para eventos en Bogotá, Medellín, Cali y todo Colombia. ¡Además, es gratis!
           </p>
           <div className='button-container'>
             <ButtonLink
@@ -49,9 +49,10 @@ const Page: React.FC = () => (
         <div className='center'>
           <Heading type={5} color='gray' text='Venta de entradas sostenible' />
           <p className='gray form-information'>
-            Páginas impresionantes con tu marca para promocionar tu evento. Para comenzar a vender entradas 
-            en línea con QRTixsPro, primero crearás un hermoso sitio web para promocionar tu evento en 
-            cualquier ciudad de Colombia, desde conciertos en el Movistar Arena hasta festivales en Cartagena.
+            Páginas impresionantes con tu marca para promocionar tu evento. Para comenzar a vender
+            entradas en línea con QRTixsPro, primero crearás un hermoso sitio web para promocionar
+            tu evento en cualquier ciudad de Colombia, desde conciertos en el Movistar Arena hasta
+            festivales en Cartagena.
           </p>
           <div className='button-container'>
             <ButtonLink
@@ -103,12 +104,7 @@ const Page: React.FC = () => (
       </div>
 
       <div className='button-container center'>
-        <ButtonLink
-          text='Comenzar'
-          color='gray-filled'
-          rightIcon='arrow_forward'
-          url='contact'
-        />
+        <ButtonLink text='Comenzar' color='gray-filled' rightIcon='arrow_forward' url='contact' />
       </div>
     </Section>
   </Master>
@@ -116,7 +112,8 @@ const Page: React.FC = () => (
 
 const title = 'Promotores | QRTixsPro';
 const canonical = 'https://qrtixspro.com/promoters';
-const description = 'QRTixsPro es la solución moderna de venta de entradas para eventos en Colombia';
+const description =
+  'QRTixsPro es la solución moderna de venta de entradas para eventos en Colombia';
 
 export const metadata: Metadata = {
   title,

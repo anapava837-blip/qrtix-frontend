@@ -23,7 +23,9 @@ interface IFormProps {
 
 const Form: React.FC = () => {
   const { showAlert, hideAlert } = useAlert();
-  const { errors, validateSingleField, validateForm } = useFormValidation(commonValidationRules.emailChange);
+  const { errors, validateSingleField, validateForm } = useFormValidation(
+    commonValidationRules.emailChange
+  );
 
   const [loading, setLoading] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<IFormProps>({
@@ -130,7 +132,11 @@ const Form: React.FC = () => {
               required
               onChange={handleChange}
             />
-            {errors.email && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.email}</span>}
+            {errors.email && (
+              <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                {errors.email}
+              </span>
+            )}
           </div>
         </div>
         <div className='form-line'>
@@ -147,7 +153,11 @@ const Form: React.FC = () => {
               required
               onChange={handleChange}
             />
-            {errors.emailAgain && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.emailAgain}</span>}
+            {errors.emailAgain && (
+              <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                {errors.emailAgain}
+              </span>
+            )}
           </div>
         </div>
         <div className='form-buttons'>

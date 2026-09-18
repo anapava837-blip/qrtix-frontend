@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { jsPDF } from 'jspdf';
+import QRCode from 'qrcode';
 import './PurchaseForm.css';
 
 interface SeatInfo {
@@ -130,33 +132,24 @@ export default function PurchaseForm({ purchaseData, reservationInfo }: Purchase
     }
 
     try {
-      const hasValidData =
-        formData.firstName &&
-        formData.lastName &&
-        formData.email &&
-        formData.documentNumber;
+      const BRAND_BLUE = [37, 99, 235];
+      const BRAND_DARK = [15, 23, 42];
+      const BRAND_ORANGE = [249, 115, 22];
+      const BRAND_PURPLE = [79, 70, 229];
+      const BRAND_GREEN = [22, 163, 74];
+      const MUTED = [100, 116, 139];
+      const GRAY_LINE = [203, 213, 225];
 
-      const safeCustomerData = hasValidData
-        ? {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            documentType: formData.documentType,
-            documentNumber: formData.documentNumber,
-            address: formData.address,
-            city: formData.city,
-          }
-        : {
-            firstName: 'Usuario',
-            lastName: 'QRTixPro',
-            email: 'correo@correo.com',
-            phone: '0000000000',
-            documentType: 'C.C',
-            documentNumber: '00000000',
-            address: '',
-            city: '',
-          };
+      const safeCustomerData = {
+        firstName: formData.firstName || 'Usuario',
+        lastName: formData.lastName || 'QRTixPro',
+        email: formData.email || 'correo@correo.com',
+        phone: formData.phone || '0000000000',
+        documentType: formData.documentType || 'C.C',
+        documentNumber: formData.documentNumber || '00000000',
+        address: formData.address,
+        city: formData.city,
+      };
 
       const safeSeats =
         purchaseData?.seats && Array.isArray(purchaseData.seats) && purchaseData.seats.length > 0
@@ -164,91 +157,317 @@ export default function PurchaseForm({ purchaseData, reservationInfo }: Purchase
               zone: s.zone || 'General',
               row: s.row ?? 'N/A',
               seat: s.seat ?? 'N/A',
-              price: s.price,
+              price: s.price ?? 0,
             }))
           : [{ zone: 'General', row: 'N/A', seat: 'N/A', price: 0 }];
 
       const safeTotalPrice =
         typeof purchaseData?.totalPrice === 'number' ? purchaseData.totalPrice : 0;
 
-      const payload: any = {
-        customerData: safeCustomerData,
-        seats: safeSeats,
-        totalPrice: safeTotalPrice,
-      };
+      const fullName =
+        `${safeCustomerData.firstName} ${safeCustomerData.lastName}`.trim();
+      const document = `${safeCustomerData.documentType} - ${safeCustomerData.documentNumber}`;
+      const totalTickets = safeSeats.length;
 
-      if (lastPurchaseId) {
-        payload.purchaseId = lastPurchaseId;
-      }
-
-      console.log('[Descargar Boletas] Payload enviado:', payload);
-
-      const response = await fetch('/api/generate-tickets', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/pdf, */*',
-        },
-        body: JSON.stringify(payload),
+      console.log('[Descargar Boletas JS] Generando PDF cliente...', {
+        totalTickets,
+        safeTotalPrice,
       });
 
-      if (response.ok) {
-        const blob = await response.blob();
-        console.log('[Descargar Boletas] PDF OK. Tamaño:', blob.size, 'bytes');
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'letter',
+        compress: true,
+      });
 
-        if (!blob || blob.size < 100) {
-          throw new Error('El PDF está vacío. Inténtelo de nuevo.');
-        }
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const marginLeft = 10;
+      const contentWidth = pageW - marginLeft * 2;
 
-        const url = window.URL.createObjectURL(blob);
-        const filename = lastPurchaseId
-          ? `boletas-qrtixpro-${lastPurchaseId}.pdf`
-          : 'boletas-qrtixpro.pdf';
-
-        if (typeof window.navigator !== 'undefined' && (window.navigator as any).msSaveOrOpenBlob) {
-          (window.navigator as any).msSaveOrOpenBlob(blob, filename);
-        } else {
-          const a = document.createElement('a');
-          a.style.display = 'none';
-          a.style.position = 'absolute';
-          a.style.top = '-1000px';
-          a.href = url;
-          a.download = filename;
-          a.rel = 'noopener';
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(() => {
-            try {
-              document.body.removeChild(a);
-            } catch (_) {}
-            try {
-              window.URL.revokeObjectURL(url);
-            } catch (_) {}
-          }, 2000);
-        }
-      } else {
-        let errMsg = 'Error al generar las boletas. Por favor, inténtelo de nuevo.';
+      const formatMoney = (v: number) => {
         try {
-          const errData = await response.json();
-          console.error('[Descargar Boletas] Respuesta ERROR:', response.status, errData);
-          if (errData?.error) errMsg = errData.error;
-          if (errData?.detail) errMsg = `${errMsg}. Detalle: ${errData.detail}`;
-        } catch (parseErr) {
-          console.error(
-            '[Descargar Boletas] No se pudo parsear error, codigo HTTP:',
-            response.status
-          );
-          if (response.status === 400) errMsg = 'Faltan datos para generar la boleta.';
-          if (response.status === 500) errMsg = 'Error interno del servidor al generar el PDF.';
+          return new Intl.NumberFormat('es-CO').format(v);
+        } catch {
+          return String(v);
         }
-        alert(`❌ ${errMsg}\n\nCódigo: ${response.status}`);
+      };
+
+      const drawTicketFrame = () => {
+        doc.setDrawColor(BRAND_BLUE[0], BRAND_BLUE[1], BRAND_BLUE[2]);
+        doc.setLineWidth(0.8);
+        doc.roundedRect(8, 8, pageW - 16, pageH - 16, 2, 2, 'S');
+        doc.setDrawColor(GRAY_LINE[0], GRAY_LINE[1], GRAY_LINE[2]);
+        doc.setLineWidth(0.2);
+        doc.roundedRect(11, 11, pageW - 22, pageH - 22, 1.5, 1.5, 'S');
+      };
+
+      const drawLine = (y: number) => {
+        doc.setDrawColor(GRAY_LINE[0], GRAY_LINE[1], GRAY_LINE[2]);
+        doc.setLineWidth(0.2);
+        doc.line(marginLeft, y, pageW - marginLeft, y);
+      };
+
+      for (let i = 0; i < totalTickets; i++) {
+        if (i > 0) doc.addPage('letter', 'portrait');
+
+        const seat = safeSeats[i];
+        const ticketNumber = i + 1;
+        const zone = String(seat.zone).toUpperCase();
+        const row = String(seat.row);
+        const seatNum = String(seat.seat);
+        const price = typeof seat.price === 'number' ? seat.price : 0;
+
+        const uniqueTicketId = lastPurchaseId
+          ? `QRT-${lastPurchaseId}-${ticketNumber}`
+          : `QRT-${Date.now()}-${ticketNumber}-${Math.random().toString(36).slice(2, 7)}`;
+
+        const qrPayload = {
+          ticketId: uniqueTicketId,
+          ticketNumber,
+          totalTickets,
+          purchaseId: lastPurchaseId ?? null,
+          event: 'QRTixPro Oficial',
+          zone,
+          row,
+          seat: seatNum,
+          price,
+          customerName: fullName,
+          customerDocument: safeCustomerData.documentNumber,
+          customerEmail: safeCustomerData.email,
+          issuedAt: new Date().toISOString(),
+          valid: true,
+        };
+
+        let qrDataUrl = '';
+        try {
+          qrDataUrl = await QRCode.toDataURL(JSON.stringify(qrPayload), {
+            errorCorrectionLevel: 'H',
+            margin: 1,
+            width: 400,
+            color: { dark: '#0f172a', light: '#ffffff' },
+          });
+        } catch (qrErr) {
+          console.error('[Descargar Boletas JS] Error QR:', qrErr);
+        }
+
+        drawTicketFrame();
+
+        // HEADER AZUL
+        doc.setFillColor(239, 246, 255);
+        doc.roundedRect(11, 11, pageW - 22, 28, 1.5, 1.5, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(26);
+        doc.setTextColor(BRAND_BLUE[0], BRAND_BLUE[1], BRAND_BLUE[2]);
+        doc.text('QRTixPro', pageW / 2, 29, { align: 'center' });
+        doc.setFontSize(10);
+        doc.setTextColor(BRAND_DARK[0], BRAND_DARK[1], BRAND_DARK[2]);
+        doc.text('BOLETA DIGITAL OFICIAL', pageW / 2, 36, { align: 'center' });
+
+        // INFO BOLETA
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+        doc.text(`Boleta N. ${ticketNumber} de ${totalTickets}`, marginLeft, 48);
+        if (lastPurchaseId) {
+          doc.text(`Compra: ${lastPurchaseId}`, marginLeft, 54);
+        }
+        const emittedAt = new Date().toLocaleString('es-CO');
+        doc.text(`Emitido: ${emittedAt}`, marginLeft, lastPurchaseId ? 60 : 54);
+
+        let yCursor = lastPurchaseId ? 68 : 62;
+        drawLine(yCursor);
+        yCursor += 5;
+
+        // EVENTO
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13);
+        doc.setTextColor(BRAND_BLUE[0], BRAND_BLUE[1], BRAND_BLUE[2]);
+        doc.text('EVENTO', marginLeft, yCursor);
+        yCursor += 7;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(BRAND_DARK[0], BRAND_DARK[1], BRAND_DARK[2]);
+        doc.text('Evento:  Concierto / Evento Oficial QRTixPro', marginLeft, yCursor);
+        yCursor += 5;
+        doc.text('Fecha y hora: A confirmar con el organizador', marginLeft, yCursor);
+        yCursor += 5;
+        doc.text('Lugar: Coliseo / Estadio Principal', marginLeft, yCursor);
+        yCursor += 8;
+
+        drawLine(yCursor);
+        yCursor += 5;
+
+        // ASIENTO
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13);
+        doc.setTextColor(BRAND_ORANGE[0], BRAND_ORANGE[1], BRAND_ORANGE[2]);
+        doc.text('INFORMACION DEL ASIENTO', marginLeft, yCursor);
+        yCursor += 8;
+
+        const colW = (contentWidth - 8) / 3;
+        const asientoY = yCursor;
+        doc.setFillColor(248, 250, 252);
+        doc.roundedRect(marginLeft, asientoY, contentWidth, 18, 1.5, 1.5, 'F');
+        doc.setFontSize(8);
+        doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Zona', marginLeft + 3, asientoY + 5);
+        doc.text('Fila', marginLeft + 3 + colW + 4, asientoY + 5);
+        doc.text('Asiento', marginLeft + 3 + (colW + 4) * 2, asientoY + 5);
+        doc.setFontSize(11);
+        doc.setTextColor(BRAND_DARK[0], BRAND_DARK[1], BRAND_DARK[2]);
+        doc.setFont('helvetica', 'bold');
+        doc.text(zone, marginLeft + 3, asientoY + 14);
+        doc.text(row, marginLeft + 3 + colW + 4, asientoY + 14);
+        doc.text(seatNum, marginLeft + 3 + (colW + 4) * 2, asientoY + 14);
+        yCursor = asientoY + 24;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(BRAND_DARK[0], BRAND_DARK[1], BRAND_DARK[2]);
+        if (price && !Number.isNaN(price)) {
+          doc.text(`Valor individual: $${formatMoney(price)} COP`, marginLeft, yCursor);
+          yCursor += 5;
+        }
+        if (safeTotalPrice > 0 && ticketNumber === totalTickets) {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(11);
+          doc.setTextColor(BRAND_GREEN[0], BRAND_GREEN[1], BRAND_GREEN[2]);
+          doc.text(`TOTAL COMPRA: $${formatMoney(safeTotalPrice)} COP`, marginLeft, yCursor);
+          yCursor += 8;
+        } else {
+          yCursor += 3;
+        }
+
+        drawLine(yCursor);
+        yCursor += 5;
+
+        // TITULAR
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13);
+        doc.setTextColor(BRAND_PURPLE[0], BRAND_PURPLE[1], BRAND_PURPLE[2]);
+        doc.text('TITULAR DE LA BOLETA', marginLeft, yCursor);
+        yCursor += 7;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(BRAND_DARK[0], BRAND_DARK[1], BRAND_DARK[2]);
+        doc.text(`Nombre completo: ${fullName}`, marginLeft, yCursor);
+        yCursor += 5;
+        doc.text(`Documento: ${document}`, marginLeft, yCursor);
+        yCursor += 5;
+        doc.text(`Correo: ${safeCustomerData.email}`, marginLeft, yCursor);
+        yCursor += 5;
+        doc.text(`Telefono: ${safeCustomerData.phone}`, marginLeft, yCursor);
+        yCursor += 5;
+        if (safeCustomerData.city) {
+          doc.text(`Ciudad: ${safeCustomerData.city}`, marginLeft, yCursor);
+          yCursor += 5;
+        }
+        yCursor += 3;
+
+        drawLine(yCursor);
+        yCursor += 6;
+
+        // QR + INFO DERECHA
+        const qrSizeMm = 40;
+        const qrX = marginLeft;
+        const qrY = yCursor;
+
+        if (qrDataUrl) {
+          doc.setDrawColor(BRAND_BLUE[0], BRAND_BLUE[1], BRAND_BLUE[2]);
+          doc.setLineWidth(0.4);
+          doc.roundedRect(qrX - 1, qrY - 1, qrSizeMm + 2, qrSizeMm + 2, 1, 1, 'S');
+          doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSizeMm, qrSizeMm, undefined, 'FAST');
+          doc.setFontSize(7);
+          doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+          doc.setFont('helvetica', 'normal');
+          doc.text('Escanee este codigo QR a la entrada', qrX + qrSizeMm / 2, qrY + qrSizeMm + 5, {
+            align: 'center',
+          });
+        } else {
+          doc.setFillColor(254, 226, 226);
+          doc.roundedRect(qrX, qrY, qrSizeMm, qrSizeMm, 1, 1, 'F');
+          doc.setFontSize(8);
+          doc.setTextColor(153, 27, 27);
+          doc.text('(QR no disponible)', qrX + qrSizeMm / 2, qrY + qrSizeMm / 2, {
+            align: 'center',
+          });
+          doc.text(`ID: ${uniqueTicketId}`, qrX + qrSizeMm / 2, qrY + qrSizeMm / 2 + 4, {
+            align: 'center',
+          });
+        }
+
+        const infoX = qrX + qrSizeMm + 6;
+        const infoW = pageW - infoX - marginLeft;
+        doc.setFontSize(9);
+        doc.setTextColor(BRAND_BLUE[0], BRAND_BLUE[1], BRAND_BLUE[2]);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`ID: ${uniqueTicketId}`, infoX, yCursor + 3);
+        yCursor += 8;
+        doc.setFontSize(9);
+        doc.setTextColor(BRAND_DARK[0], BRAND_DARK[1], BRAND_DARK[2]);
+        doc.setFont('helvetica', 'normal');
+        const lines = [
+          'Esta boleta es intransferible y valida unicamente para la fecha y evento indicados.',
+          'Presente esta boleta IMPRESA o DIGITAL + su documento de identidad ORIGINAL a la entrada.',
+          'No se aceptan copias ni modificaciones. Cualquier alteracion anula la boleta automaticamente.',
+        ];
+        const splitLines = lines.map((l) => doc.splitTextToSize(l, infoW));
+        let lineY = yCursor + 1;
+        for (const block of splitLines) {
+          for (const l of block) {
+            doc.text(String(l), infoX, lineY);
+            lineY += 4.2;
+          }
+          lineY += 1;
+        }
+
+        // FOOTER
+        const footerY = pageH - 18;
+        doc.setDrawColor(GRAY_LINE[0], GRAY_LINE[1], GRAY_LINE[2]);
+        doc.setLineWidth(0.2);
+        doc.line(marginLeft, footerY - 4, pageW - marginLeft, footerY - 4);
+        doc.setFontSize(9);
+        doc.setTextColor(71, 85, 105);
+        doc.setFont('helvetica', 'normal');
+        doc.text(
+          'QRTixPro - Plataforma oficial de venta y gestion de boletas digitales.',
+          pageW / 2,
+          footerY,
+          { align: 'center' }
+        );
+        doc.setFontSize(8);
+        doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+        doc.text(
+          'Conserve este comprobante. Para soporte contactese con el organizador del evento.',
+          pageW / 2,
+          footerY + 5,
+          { align: 'center' }
+        );
+        doc.text(
+          `Valido hasta agotar existencia. (c) ${new Date().getFullYear()} QRTixPro - Todos los derechos reservados.   Pag ${ticketNumber} de ${totalTickets}`,
+          pageW / 2,
+          footerY + 9,
+          { align: 'center' }
+        );
       }
+
+      const filename = lastPurchaseId
+        ? `boletas-qrtixpro-${lastPurchaseId}.pdf`
+        : 'boletas-qrtixpro.pdf';
+
+      console.log('[Descargar Boletas JS] Guardando PDF:', filename);
+      doc.save(filename);
+
+      console.log('[Descargar Boletas JS] OK - PDF descargado.');
     } catch (error: any) {
-      console.error('[Descargar Boletas] ERROR CAPTURADO:', error?.message ?? error, error);
+      console.error('[Descargar Boletas JS] ERROR:', error?.message ?? error, error);
       alert(
         `❌ No se pudo descargar la boleta.\n\nError: ${
           error?.message ? error.message : 'Desconocido'
-        }\n\nPor favor, actualice la página e intente nuevamente.`
+        }\n\nPor favor, intente nuevamente.`
       );
     }
   };

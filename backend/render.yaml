@@ -24,7 +24,7 @@ services:
       pip install --no-cache-dir --only-binary=:all: --find-links https://download.pytorch.org/whl/cpu -r requirements.txt || \
       pip install --no-cache-dir --prefer-binary -r requirements.txt
 
-    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1"
+    startCommand: 'uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1'
 
     healthCheckPath: /health
     healthCheckTimeout: 300
@@ -37,24 +37,24 @@ services:
       #  Py 3.13+ NO TIENE wheels precompilados para numpy/scipy/pydantic_core.
       # ============================================================
       - key: PYTHON_VERSION
-        value: "3.12.8"
+        value: '3.12.8'
 
       - key: PORT
-        value: "10000"
+        value: '10000'
 
       # Render usa NIXPACKS: evita compilar desde fuentes
       - key: NIXPACKS_NO_SOURCE_BUILD
-        value: "1"
+        value: '1'
       - key: PIP_ONLY_BINARY
-        value: ":all:"
+        value: ':all:'
       - key: PIP_PREFER_BINARY
-        value: "true"
+        value: 'true'
       - key: CARGO_NET_OFFLINE
-        value: "true"
+        value: 'true'
 
       - key: MONGO_URI
         sync: false
-        value: "mongodb+srv://angelgutierrezrobayo935:M423i32R4@cluster0.abwxf0v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+        value: 'mongodb+srv://angelgutierrezrobayo935:M423i32R4@cluster0.abwxf0v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
 
       - key: DB_NAME
         value: qrtixpro
@@ -68,9 +68,9 @@ services:
         value: logs
 
       - key: RESERVATION_MINUTES
-        value: "15"
+        value: '15'
       - key: FACE_RECOGNITION_THRESHOLD
-        value: "0.50"
+        value: '0.50'
 
       - key: CORS_ORIGIN_REGEX
-        value: ".*"
+        value: '.*'

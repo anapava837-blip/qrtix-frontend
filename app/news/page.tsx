@@ -39,7 +39,10 @@ export default function Page() {
           <div className='section-header'>
             <Heading type={2} color='red' text='Festivales' />
           </div>
-          <div className='events-row' style={{ display: 'flex', overflowX: 'auto', gap: '20px', padding: '10px 0' }}>
+          <div
+            className='events-row'
+            style={{ display: 'flex', overflowX: 'auto', gap: '20px', padding: '10px 0' }}
+          >
             <NewsCard
               url='1'
               color='red'
@@ -71,7 +74,10 @@ export default function Page() {
           <div className='section-header'>
             <Heading type={2} color='blue' text='Conciertos' />
           </div>
-          <div className='events-row' style={{ display: 'flex', overflowX: 'auto', gap: '20px', padding: '10px 0' }}>
+          <div
+            className='events-row'
+            style={{ display: 'flex', overflowX: 'auto', gap: '20px', padding: '10px 0' }}
+          >
             <NewsCard
               url='2'
               color='blue'
@@ -96,7 +102,10 @@ export default function Page() {
           <div className='section-header'>
             <Heading type={2} color='purple' text='Eventos Especiales' />
           </div>
-          <div className='events-row' style={{ display: 'flex', overflowX: 'auto', gap: '20px', padding: '10px 0' }}>
+          <div
+            className='events-row'
+            style={{ display: 'flex', overflowX: 'auto', gap: '20px', padding: '10px 0' }}
+          >
             <NewsCard
               url='4'
               color='purple'

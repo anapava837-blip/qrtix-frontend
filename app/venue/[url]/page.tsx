@@ -44,10 +44,10 @@ const Page = async ({ params }: PageProps) => {
     return (
       <Master>
         <Section>
-          <div className="container">
-            <div className="center">
-              <Heading type={1} color="gray" text="Lugar no encontrado" />
-              <p className="gray">El lugar que estás buscando no existe o ha sido eliminado.</p>
+          <div className='container'>
+            <div className='center'>
+              <Heading type={1} color='gray' text='Lugar no encontrado' />
+              <p className='gray'>El lugar que estás buscando no existe o ha sido eliminado.</p>
             </div>
           </div>
         </Section>
@@ -78,31 +78,31 @@ const Page = async ({ params }: PageProps) => {
       <Section className='white-background'>
         <div className='container'>
           <div className='venue-details'>
-            <Box className="content-box">
+            <Box className='content-box'>
               <Heading type={4} color='gray' text='Detalles Del Lugar' />
               <div className='paragraph-container gray'>
                 <p>{venue.description}</p>
               </div>
             </Box>
 
-            <Box className="info-box mt-20">
+            <Box className='info-box mt-20'>
               <div className='info-details'>
                 <div className='info-item'>
-                  <span className="material-symbols-outlined">people</span>
+                  <span className='material-symbols-outlined'>people</span>
                   <div>
                     <Heading type={6} color='gray' text='Capacidad' />
                     <p className='gray'>{venue.capacity}</p>
                   </div>
                 </div>
                 <div className='info-item'>
-                  <span className="material-symbols-outlined">location_on</span>
+                  <span className='material-symbols-outlined'>location_on</span>
                   <div>
                     <Heading type={6} color='gray' text='Dirección' />
                     <p className='gray'>{venue.address}</p>
                   </div>
                 </div>
                 <div className='info-item'>
-                  <span className="material-symbols-outlined">language</span>
+                  <span className='material-symbols-outlined'>language</span>
                   <div>
                     <Heading type={6} color='gray' text='Sitio Web' />
                     <p className='gray'>{venue.website}</p>

@@ -16,7 +16,8 @@ const Page: React.FC = () => (
         <div className='center'>
           <Heading type={1} color='gray' text='Iniciar Sesión' />
           <p className='gray form-information'>
-           Ingrese su dirección de correo electrónico y contraseña para iniciar sesión. ¿No tienes una cuenta?{' '}
+            Ingrese su dirección de correo electrónico y contraseña para iniciar sesión. ¿No tienes
+            una cuenta?{' '}
             <Link href='/members/signup' className='blue'>
               Regístrate aquí
             </Link>

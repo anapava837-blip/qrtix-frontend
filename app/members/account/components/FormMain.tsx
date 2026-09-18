@@ -55,7 +55,9 @@ const FormMain: React.FC<IProps> = ({ data }) => {
   });
 
   // Validaciones
-  const { errors, validateSingleField, validateForm } = useFormValidation(commonValidationRules.account);
+  const { errors, validateSingleField, validateForm } = useFormValidation(
+    commonValidationRules.account
+  );
 
   /**
    * Handles the change event for input fields in the form.
@@ -76,7 +78,7 @@ const FormMain: React.FC<IProps> = ({ data }) => {
 
   const buscarDatos = async () => {
     console.log('🔍 Iniciando búsqueda con cédula:', formValues.cedula);
-    
+
     if (!formValues.cedula) {
       alert('Por favor ingresa una cédula para buscar');
       return;
@@ -85,21 +87,21 @@ const FormMain: React.FC<IProps> = ({ data }) => {
     try {
       const url = `http://localhost:8001/v1/user/search/${formValues.cedula}`;
       console.log('📡 Haciendo fetch a:', url);
-      
+
       const response = await fetch(url);
       console.log('📥 Respuesta recibida:', response.status, response.statusText);
-      
+
       if (response.ok) {
         const userData = await response.json();
         console.log('✅ Datos del usuario:', userData);
-        
+
         setFormValues({
           cedula: userData.cedula || '',
           name: userData.name || '',
           lastname: userData.lastname || '',
           telefono: userData.telefono || '',
           email: userData.email || '',
-          password: userData.password || '' // Ahora mostrar la contraseña encontrada
+          password: userData.password || '', // Ahora mostrar la contraseña encontrada
         });
         alert('Datos encontrados y cargados exitosamente');
       } else if (response.status === 404) {
@@ -121,15 +123,19 @@ const FormMain: React.FC<IProps> = ({ data }) => {
       return;
     }
 
-    if (!confirm('¿Estás seguro de que quieres eliminar este usuario? Esta acción no se puede deshacer.')) {
+    if (
+      !confirm(
+        '¿Estás seguro de que quieres eliminar este usuario? Esta acción no se puede deshacer.'
+      )
+    ) {
       return;
     }
 
     try {
       const response = await fetch(`http://localhost:8001/v1/user/delete/${formValues.cedula}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       });
-      
+
       if (response.ok) {
         setFormValues({
           cedula: '',
@@ -172,7 +178,7 @@ const FormMain: React.FC<IProps> = ({ data }) => {
         name: formValues.name,
         lastname: formValues.lastname,
         email: formValues.email,
-        telefono: formValues.telefono
+        telefono: formValues.telefono,
       };
 
       const response = await fetch('http://localhost:8001/v1/user/update', {
@@ -205,10 +211,10 @@ const FormMain: React.FC<IProps> = ({ data }) => {
       {/* Sección de imagen del usuario */}
       <div className='form-elements' style={{ marginBottom: '2rem' }}>
         <div className='center'>
-          <ProfilePhoto 
-            image={user?.photo || 'https://www.cenksari.com/content/profile.jpg'} 
-            size='large' 
-            alt={`Foto de ${user?.name || 'Usuario'}`} 
+          <ProfilePhoto
+            image={user?.photo || 'https://www.cenksari.com/content/profile.jpg'}
+            size='large'
+            alt={`Foto de ${user?.name || 'Usuario'}`}
           />
           <h3 style={{ marginTop: '1rem', color: '#666' }}>
             {user?.name} {user?.lastname}
@@ -238,23 +244,17 @@ const FormMain: React.FC<IProps> = ({ data }) => {
                 required
                 onChange={handleChange}
               />
-              {errors.cedula && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.cedula}</span>}
+              {errors.cedula && (
+                <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                  {errors.cedula}
+                </span>
+              )}
             </div>
           </div>
           <div className='form-buttons' style={{ marginBottom: '2rem' }}>
-            <Button 
-              type='button' 
-              color='blue-filled' 
-              text='Buscar Datos' 
-              onClick={buscarDatos}
-            />
+            <Button type='button' color='blue-filled' text='Buscar Datos' onClick={buscarDatos} />
             &nbsp; &nbsp;
-            <Button 
-              type='button' 
-              color='red-filled' 
-              text='Borrar Datos' 
-              onClick={borrarDatos}
-            />
+            <Button type='button' color='red-filled' text='Borrar Datos' onClick={borrarDatos} />
           </div>
           <div className='form-line'>
             <div className='one-line'>
@@ -270,7 +270,11 @@ const FormMain: React.FC<IProps> = ({ data }) => {
                 required
                 onChange={handleChange}
               />
-              {errors.name && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.name}</span>}
+              {errors.name && (
+                <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                  {errors.name}
+                </span>
+              )}
             </div>
           </div>
           <div className='form-line'>
@@ -287,7 +291,11 @@ const FormMain: React.FC<IProps> = ({ data }) => {
                 required
                 onChange={handleChange}
               />
-              {errors.lastname && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.lastname}</span>}
+              {errors.lastname && (
+                <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                  {errors.lastname}
+                </span>
+              )}
             </div>
           </div>
           <div className='form-line'>
@@ -304,7 +312,11 @@ const FormMain: React.FC<IProps> = ({ data }) => {
                 required
                 onChange={handleChange}
               />
-              {errors.telefono && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.telefono}</span>}
+              {errors.telefono && (
+                <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                  {errors.telefono}
+                </span>
+              )}
             </div>
           </div>
           <div className='form-line'>
@@ -324,7 +336,11 @@ const FormMain: React.FC<IProps> = ({ data }) => {
                 required
                 onChange={handleChange}
               />
-              {errors.email && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.email}</span>}
+              {errors.email && (
+                <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                  {errors.email}
+                </span>
+              )}
             </div>
           </div>
           <div className='form-line'>
@@ -356,7 +372,7 @@ const FormMain: React.FC<IProps> = ({ data }) => {
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: '18px',
-                  color: '#666'
+                  color: '#666',
                 }}
               >
                 {showPassword ? '👁️' : '👁️‍🗨️'}

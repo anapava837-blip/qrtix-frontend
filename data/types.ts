@@ -6,11 +6,7 @@
 //  no-default desde page files.
 // ============================================================
 
-export type StadiumZone =
-  | 'occidental'
-  | 'oriental'
-  | 'sur'
-  | 'norte';
+export type StadiumZone = 'occidental' | 'oriental' | 'sur' | 'norte';
 
 export interface Seat {
   id: string;

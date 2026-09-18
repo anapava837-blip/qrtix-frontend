@@ -21,7 +21,9 @@
   background: #ffffff;
   border-radius: 24px;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 20px 50px -20px rgba(15, 23, 42, 0.18), 0 4px 10px rgba(15, 23, 42, 0.06);
+  box-shadow:
+    0 20px 50px -20px rgba(15, 23, 42, 0.18),
+    0 4px 10px rgba(15, 23, 42, 0.06);
   padding: 18px 10px 24px 10px;
 }
 
@@ -37,7 +39,10 @@
 /* Estilos para asientos SVG */
 .stadium-seat {
   cursor: pointer;
-  transition: transform 160ms ease, filter 160ms ease, stroke 160ms ease;
+  transition:
+    transform 160ms ease,
+    filter 160ms ease,
+    stroke 160ms ease;
   transform-box: fill-box;
   transform-origin: center;
 }
@@ -150,7 +155,9 @@
   border: none;
   cursor: pointer;
   transition: all 220ms ease;
-  box-shadow: 0 10px 20px -12px rgba(37, 99, 235, 0.55), 0 2px 6px rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 10px 20px -12px rgba(37, 99, 235, 0.55),
+    0 2px 6px rgba(15, 23, 42, 0.08);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -166,7 +173,9 @@
 
 .purchase-button:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 14px 24px -12px rgba(37, 99, 235, 0.7), 0 3px 8px rgba(15, 23, 42, 0.1);
+  box-shadow:
+    0 14px 24px -12px rgba(37, 99, 235, 0.7),
+    0 3px 8px rgba(15, 23, 42, 0.1);
 }
 
 .purchase-button:active:not(:disabled) {
@@ -175,7 +184,9 @@
 
 .left-icon {
   font-size: 20px;
-  font-variation-settings: 'FILL' 1, 'wght' 500;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 500;
 }
 
 .legend-item {
@@ -214,7 +225,7 @@
   height: 500px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   margin: 20px auto;
   overflow: hidden;
 }
@@ -238,7 +249,7 @@
   color: white;
   font-weight: bold;
   font-size: 1rem;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .arena-section {
@@ -289,7 +300,7 @@
   background: rgba(255, 255, 255, 0.95);
   padding: 4px 8px;
   border-radius: 15px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(5px);
   top: -25px;
   left: 50%;
@@ -352,8 +363,8 @@
   transform: translate(-50%, -50%);
   width: 280px;
   height: 180px;
-  background: linear-gradient(135deg, #4CAF50, #66BB6A);
-  border: 2px solid #2E7D32;
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  border: 2px solid #2e7d32;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -378,7 +389,7 @@
   font-weight: bold;
   font-size: 14px;
   text-align: center;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .tribune-section {
@@ -440,15 +451,31 @@
   background: rgba(255, 255, 255, 0.95);
   padding: 4px 8px;
   border-radius: 15px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(5px);
   display: none;
 }
 
-.norte-section .tribune-header { top: -35px; left: 50%; transform: translateX(-50%); }
-.sur-section .tribune-header { bottom: -35px; left: 50%; transform: translateX(-50%); }
-.oriental-section .tribune-header { top: 50%; right: -60px; transform: translateY(-50%) rotate(90deg); }
-.occidental-section .tribune-header { top: 50%; left: -60px; transform: translateY(-50%) rotate(-90deg); }
+.norte-section .tribune-header {
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.sur-section .tribune-header {
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.oriental-section .tribune-header {
+  top: 50%;
+  right: -60px;
+  transform: translateY(-50%) rotate(90deg);
+}
+.occidental-section .tribune-header {
+  top: 50%;
+  left: -60px;
+  transform: translateY(-50%) rotate(-90deg);
+}
 
 .tribune-header h3 {
   margin: 0;
@@ -518,15 +545,29 @@
   flex-shrink: 0;
 }
 
-.norte-tribune .seat.available { background: #e91e63; box-shadow: 0 1px 3px rgba(233, 30, 99, 0.3); }
-.sur-tribune .seat.available { background: #4caf50; box-shadow: 0 1px 3px rgba(76, 175, 80, 0.3); }
-.occidental-tribune .seat.available { background: #9c27b0; box-shadow: 0 1px 3px rgba(156, 39, 176, 0.3); }
-.oriental-tribune .seat.available { background: #ff9800; box-shadow: 0 1px 3px rgba(255, 152, 0, 0.3); }
+.norte-tribune .seat.available {
+  background: #e91e63;
+  box-shadow: 0 1px 3px rgba(233, 30, 99, 0.3);
+}
+.sur-tribune .seat.available {
+  background: #4caf50;
+  box-shadow: 0 1px 3px rgba(76, 175, 80, 0.3);
+}
+.occidental-tribune .seat.available {
+  background: #9c27b0;
+  box-shadow: 0 1px 3px rgba(156, 39, 176, 0.3);
+}
+.oriental-tribune .seat.available {
+  background: #ff9800;
+  box-shadow: 0 1px 3px rgba(255, 152, 0, 0.3);
+}
 
 .seat.available:hover {
   transform: scale(1.8);
   border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 12px rgba(255,255,255,0.8), 0 3px 6px rgba(0,0,0,0.2);
+  box-shadow:
+    0 0 12px rgba(255, 255, 255, 0.8),
+    0 3px 6px rgba(0, 0, 0, 0.2);
   z-index: 25;
   filter: brightness(1.2);
 }
@@ -535,7 +576,9 @@
   background: #ffffff !important;
   border: 1.5px solid #333 !important;
   transform: scale(1.6);
-  box-shadow: 0 0 15px rgba(0,0,0,0.6), 0 3px 8px rgba(0,0,0,0.3);
+  box-shadow:
+    0 0 15px rgba(0, 0, 0, 0.6),
+    0 3px 8px rgba(0, 0, 0, 0.3);
   z-index: 30;
 }
 
@@ -543,8 +586,8 @@
   background: #757575 !important;
   cursor: not-allowed;
   opacity: 0.3;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
-  border: 0.5px solid rgba(0,0,0,0.2);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  border: 0.5px solid rgba(0, 0, 0, 0.2);
 }
 
 /* Selection Info */
@@ -647,12 +690,36 @@
 }
 
 @media (max-width: 768px) {
-  .stadium-container { padding: 8px; }
-  .stadium-layout { width: 600px; height: 450px; padding: 15px; }
-  .field { width: 200px; height: 130px; }
-  .field-text { font-size: 0.7rem; }
-  .norte-section, .sur-section { width: 400px; height: 60px; }
-  .occidental-section, .oriental-section { width: 60px; height: 300px; }
-  .tribune-header h3 { font-size: 0.65rem; }
-  .seat { width: 6px; height: 6px; }
+  .stadium-container {
+    padding: 8px;
+  }
+  .stadium-layout {
+    width: 600px;
+    height: 450px;
+    padding: 15px;
+  }
+  .field {
+    width: 200px;
+    height: 130px;
+  }
+  .field-text {
+    font-size: 0.7rem;
+  }
+  .norte-section,
+  .sur-section {
+    width: 400px;
+    height: 60px;
+  }
+  .occidental-section,
+  .oriental-section {
+    width: 60px;
+    height: 300px;
+  }
+  .tribune-header h3 {
+    font-size: 0.65rem;
+  }
+  .seat {
+    width: 6px;
+    height: 6px;
+  }
 }

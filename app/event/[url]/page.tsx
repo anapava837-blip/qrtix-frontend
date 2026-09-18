@@ -23,13 +23,13 @@ interface PageProps {
 const Page: React.FC<PageProps> = async ({ params }) => {
   const resolvedParams = await params;
   const event = getEventById(resolvedParams.url);
-  
+
   if (!event) {
     notFound();
   }
 
   return (
-  <Master>
+    <Master>
       <div className='blur-cover'>
         <div
           style={{
@@ -49,66 +49,57 @@ const Page: React.FC<PageProps> = async ({ params }) => {
           <Heading type={6} color='white' text={event.venue} />
         </div>
       </div>
-    <Section className='white-background'>
-      <div className='container'>
-        <div className='event-details'>
-          <div>
-            <Heading type={4} color='gray' text='Detalles de Eventos' />
-            <div className='paragraph-container gray'>
-              <p style={{ whiteSpace: 'pre-line' }}>
-                {event.description}
-              </p>
+      <Section className='white-background'>
+        <div className='container'>
+          <div className='event-details'>
+            <div>
+              <Heading type={4} color='gray' text='Detalles de Eventos' />
+              <div className='paragraph-container gray'>
+                <p style={{ whiteSpace: 'pre-line' }}>{event.description}</p>
+              </div>
             </div>
           </div>
-
         </div>
-      </div>
-    </Section>
-    
-    <Section className='white-background'>
-      <div className='container'>
-        <Heading type={4} color='gray' text='Selecciona tus asientos' />
-        <SeatSelectorWrapper event={event} />
-      </div>
-    </Section>
+      </Section>
 
-    <Section className='white-background'>
-      <div className='container'>
-        <Heading type={4} color='gray' text={event.venueDetails.name} />
-
-        <Heading type={6} color='gray' text='Correo Electronico' />
-        <div className='paragraph-container'>
-          <p className='gray'>{event.venueDetails.email}</p>
+      <Section className='white-background'>
+        <div className='container'>
+          <Heading type={4} color='gray' text='Selecciona tus asientos' />
+          <SeatSelectorWrapper event={event} />
         </div>
-        <Heading type={6} color='gray' text='Como llegar?' />
-        <div className='paragraph-container'>
-          <p className="gray">
-           <a 
-              href={event.venueDetails.mapLink} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              >
+      </Section>
+
+      <Section className='white-background'>
+        <div className='container'>
+          <Heading type={4} color='gray' text={event.venueDetails.name} />
+
+          <Heading type={6} color='gray' text='Correo Electronico' />
+          <div className='paragraph-container'>
+            <p className='gray'>{event.venueDetails.email}</p>
+          </div>
+          <Heading type={6} color='gray' text='Como llegar?' />
+          <div className='paragraph-container'>
+            <p className='gray'>
+              <a href={event.venueDetails.mapLink} target='_blank' rel='noopener noreferrer'>
                 {event.venueDetails.mapLink}
-             </a>
-           </p>
-          <p className='gray'>
-            <Link href='/venue/1' className='blue'>
-              Detalles del lugar
-            </Link>
-            &nbsp; &bull; &nbsp;
-            <a target='_blank' href='/' className='blue'>
-              Obtener direcciones
-            </a>
-            &nbsp; &bull; &nbsp;
-            <a target='_blank' href='/' className='blue'>
-              Mostrar en el mapa
-            </a>
-          </p>
+              </a>
+            </p>
+            <p className='gray'>
+              <Link href='/venue/1' className='blue'>
+                Detalles del lugar
+              </Link>
+              &nbsp; &bull; &nbsp;
+              <a target='_blank' href='/' className='blue'>
+                Obtener direcciones
+              </a>
+              &nbsp; &bull; &nbsp;
+              <a target='_blank' href='/' className='blue'>
+                Mostrar en el mapa
+              </a>
+            </p>
+          </div>
         </div>
-      </div>
-    </Section>
-
-
+      </Section>
     </Master>
   );
 };
@@ -116,7 +107,7 @@ const Page: React.FC<PageProps> = async ({ params }) => {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const event = getEventById(resolvedParams.url);
-  
+
   if (!event) {
     return {
       title: 'Evento no encontrado',

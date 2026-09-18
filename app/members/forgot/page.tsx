@@ -14,7 +14,9 @@ const Page: React.FC = () => (
         <div className='center'>
           <Heading type={1} color='gray' text='Has olvidado tu contraseña' />
           <p className='gray form-information'>
-           Introduce tu dirección de correo electrónico registrada. Las instrucciones para restablecer tu contraseña se habrán enviado a tu correo electrónico. Si no lo ves en unos minutos, revisa tu carpeta de correo no deseado o spam.
+            Introduce tu dirección de correo electrónico registrada. Las instrucciones para
+            restablecer tu contraseña se habrán enviado a tu correo electrónico. Si no lo ves en
+            unos minutos, revisa tu carpeta de correo no deseado o spam.
           </p>
         </div>
         <Form />

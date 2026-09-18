@@ -6,10 +6,10 @@ import { getAllEvents } from '@data/events';
 const EventDetails: React.FC = () => {
   const searchParams = useSearchParams();
   const eventId = searchParams.get('eventId');
-  
+
   const events = getAllEvents();
-  const event = events.find(e => e.id === eventId);
-  
+  const event = events.find((e) => e.id === eventId);
+
   if (!event) {
     return (
       <div>

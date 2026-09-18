@@ -16,7 +16,9 @@ const Page: React.FC = () => (
         <div className='center'>
           <Heading type={1} color='gray' text='Mis Tickets' />
           <p className='gray form-information'>
-            Puedes acceder a las entradas que compraste desde esta página en cualquier momento. Puedes descargarlas o enviarlas. Nota: En esta página no podrás ver las entradas de eventos que ya hayan finalizado o cancelado.
+            Puedes acceder a las entradas que compraste desde esta página en cualquier momento.
+            Puedes descargarlas o enviarlas. Nota: En esta página no podrás ver las entradas de
+            eventos que ya hayan finalizado o cancelado.
           </p>
           <div className='button-container'>
             <ButtonGroup color='gray'>

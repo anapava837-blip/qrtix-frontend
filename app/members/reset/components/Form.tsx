@@ -126,7 +126,11 @@ const Form: React.FC = () => {
           />
         </div>
         <div className='form-buttons'>
-          <Button type='submit' color='blue-filled' text='Restablecer contraseña e iniciar sesión' />
+          <Button
+            type='submit'
+            color='blue-filled'
+            text='Restablecer contraseña e iniciar sesión'
+          />
         </div>
       </div>
     </form>

@@ -48,7 +48,10 @@ const FormSearch: React.FC = () => {
     const { keyword } = formValues;
 
     if (keyword === '' || keyword.length < 3) {
-      showAlert({ type: 'error', text: 'Por favor, introduzca un mínimo de 3 caracteres para la búsqueda.' });
+      showAlert({
+        type: 'error',
+        text: 'Por favor, introduzca un mínimo de 3 caracteres para la búsqueda.',
+      });
     }
   };
 

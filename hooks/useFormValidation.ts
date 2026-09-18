@@ -95,9 +95,9 @@ export const useFormValidation = (rules: ValidationRules) => {
 
   const validateSingleField = (name: string, value: string, formValues?: any): void => {
     const error = validateField(name, value, formValues);
-    setErrors(prev => ({
+    setErrors((prev) => ({
       ...prev,
-      [name]: error || ''
+      [name]: error || '',
     }));
   };
 
@@ -106,9 +106,9 @@ export const useFormValidation = (rules: ValidationRules) => {
   };
 
   const clearFieldError = (fieldName: string): void => {
-    setErrors(prev => ({
+    setErrors((prev) => ({
       ...prev,
-      [fieldName]: ''
+      [fieldName]: '',
     }));
   };
 
@@ -118,7 +118,7 @@ export const useFormValidation = (rules: ValidationRules) => {
     validateSingleField,
     clearErrors,
     clearFieldError,
-    hasErrors: Object.values(errors).some(error => error !== '')
+    hasErrors: Object.values(errors).some((error) => error !== ''),
   };
 };
 
@@ -133,7 +133,7 @@ export const validationPatterns = {
   code: /^[A-Za-z0-9]{4,10}$/,
   cardNumber: /^\d{13,19}$/,
   cardCvc: /^\d{3,4}$/,
-  cardExpiration: /^(0[1-9]|1[0-2])\/\d{2}$/
+  cardExpiration: /^(0[1-9]|1[0-2])\/\d{2}$/,
 };
 
 // Reglas comunes para diferentes tipos de formularios
@@ -143,135 +143,135 @@ export const commonValidationRules = {
       required: true,
       minLength: 2,
       maxLength: 48,
-      pattern: validationPatterns.name
+      pattern: validationPatterns.name,
     },
     lastname: {
       required: true,
       minLength: 2,
       maxLength: 48,
-      pattern: validationPatterns.name
+      pattern: validationPatterns.name,
     },
     email: {
       required: true,
       maxLength: 128,
-      pattern: validationPatterns.email
+      pattern: validationPatterns.email,
     },
     password: {
       required: true,
       minLength: 6,
       maxLength: 64,
-      pattern: validationPatterns.password
+      pattern: validationPatterns.password,
     },
     cedula: {
       required: true,
-      pattern: validationPatterns.cedula
+      pattern: validationPatterns.cedula,
     },
     telefono: {
       required: true,
-      pattern: validationPatterns.telefono
-    }
+      pattern: validationPatterns.telefono,
+    },
   },
   signin: {
     email: {
       required: true,
-      pattern: validationPatterns.email
+      pattern: validationPatterns.email,
     },
     password: {
       required: true,
-      minLength: 6
-    }
+      minLength: 6,
+    },
   },
   account: {
     cedula: {
       required: true,
-      pattern: validationPatterns.cedula
+      pattern: validationPatterns.cedula,
     },
     name: {
       required: true,
       minLength: 2,
       maxLength: 48,
-      pattern: validationPatterns.name
+      pattern: validationPatterns.name,
     },
     lastname: {
       required: true,
       minLength: 2,
       maxLength: 48,
-      pattern: validationPatterns.name
+      pattern: validationPatterns.name,
     },
     telefono: {
       required: true,
-      pattern: validationPatterns.telefono
+      pattern: validationPatterns.telefono,
     },
     email: {
       required: true,
       maxLength: 128,
-      pattern: validationPatterns.email
-    }
+      pattern: validationPatterns.email,
+    },
   },
   passwordChange: {
     password: {
       required: true,
-      minLength: 6
+      minLength: 6,
     },
     newPassword: {
       required: true,
       minLength: 6,
       maxLength: 64,
-      pattern: validationPatterns.password
+      pattern: validationPatterns.password,
     },
     newPasswordAgain: {
       required: true,
-      match: 'newPassword'
-    }
+      match: 'newPassword',
+    },
   },
   emailChange: {
     email: {
       required: true,
       maxLength: 128,
-      pattern: validationPatterns.email
+      pattern: validationPatterns.email,
     },
     emailAgain: {
       required: true,
-      match: 'email'
-    }
+      match: 'email',
+    },
   },
   activationCode: {
     code: {
       required: true,
       minLength: 4,
       maxLength: 10,
-      pattern: validationPatterns.code
-    }
+      pattern: validationPatterns.code,
+    },
   },
   purchase: {
     name: {
       required: true,
       minLength: 2,
       maxLength: 48,
-      pattern: validationPatterns.name
+      pattern: validationPatterns.name,
     },
     email: {
       required: true,
       maxLength: 128,
-      pattern: validationPatterns.email
+      pattern: validationPatterns.email,
     },
     cardName: {
       required: true,
       minLength: 2,
       maxLength: 64,
-      pattern: validationPatterns.name
+      pattern: validationPatterns.name,
     },
     cardNumber: {
       required: true,
-      pattern: validationPatterns.cardNumber
+      pattern: validationPatterns.cardNumber,
     },
     cardExpiration: {
       required: true,
-      pattern: validationPatterns.cardExpiration
+      pattern: validationPatterns.cardExpiration,
     },
     cardCvc: {
       required: true,
-      pattern: validationPatterns.cardCvc
-    }
-  }
+      pattern: validationPatterns.cardCvc,
+    },
+  },
 };

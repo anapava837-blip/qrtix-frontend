@@ -9,8 +9,8 @@ interface IProps {
 }
 
 const Button: React.FC<IProps> = ({ type, text, color, leftIcon, rightIcon, onClick }) => (
-  <button 
-    type={type === 'button' ? 'button' : 'submit'} 
+  <button
+    type={type === 'button' ? 'button' : 'submit'}
     className={`button ${color}`}
     onClick={onClick}
   >

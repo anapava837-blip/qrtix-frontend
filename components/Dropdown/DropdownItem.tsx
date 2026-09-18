@@ -11,10 +11,10 @@ interface IProps {
 const DropdownItem: React.FC<IProps> = ({ url, text, active, onClick }) => {
   if (onClick) {
     return (
-      <button 
-        className={active === true ? 'button active' : 'button passive'} 
+      <button
+        className={active === true ? 'button active' : 'button passive'}
         onClick={onClick}
-        type="button"
+        type='button'
       >
         {text}
       </button>

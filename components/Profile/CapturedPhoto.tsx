@@ -10,7 +10,7 @@ const CapturedPhoto: React.FC<IProps> = ({ size = 'medium', image, alt = 'Foto c
     return (
       <div className='captured-photo'>
         <div className={`placeholder ${size}`}>
-          <span className="material-symbols-outlined">photo_camera</span>
+          <span className='material-symbols-outlined'>photo_camera</span>
           <p>No hay foto capturada</p>
         </div>
       </div>
@@ -20,7 +20,7 @@ const CapturedPhoto: React.FC<IProps> = ({ size = 'medium', image, alt = 'Foto c
   return (
     <div className='captured-photo'>
       <div className={`photo-container ${size}`}>
-        <img src={image} alt={alt} className="captured-image" />
+        <img src={image} alt={alt} className='captured-image' />
       </div>
     </div>
   );

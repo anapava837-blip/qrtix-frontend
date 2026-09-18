@@ -14,8 +14,8 @@ const Page: React.FC = () => (
         <div className='center'>
           <Heading type={1} color='gray' text='Cambiar correo electrónico' />
           <p className='gray form-information'>
-            Introduce tu nueva dirección de correo electrónico. Recibirás un correo de verificación con tu código de activación. Tu dirección actual es{' '}
-            <strong>diego@gmail.com</strong>
+            Introduce tu nueva dirección de correo electrónico. Recibirás un correo de verificación
+            con tu código de activación. Tu dirección actual es <strong>diego@gmail.com</strong>
           </p>
         </div>
         <Form />

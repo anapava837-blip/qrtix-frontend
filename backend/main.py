@@ -10,11 +10,7 @@ from pydantic import BaseModel, EmailStr
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ConfigurationError
-from PIL import Image
-import imagehash
 import base64
-from io import BytesIO
-import numpy as np
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("qrtixpro-backend")
@@ -135,7 +131,7 @@ class SignupPayload(BaseModel):
 class LoginPayload(BaseModel):
     email: EmailStr
     password: str
-    photo: str  
+    photo: Optional[str] = None
 
 
 # Event models
@@ -213,15 +209,8 @@ EVENTS_DATA = [
 ]
 
 
-def data_url_to_image(data_url: str) -> Image.Image:
-    if not data_url or "," not in data_url:
-        raise ValueError("Invalid data URL")
-    header, b64 = data_url.split(",", 1)
-    if "base64" not in header:
-        raise ValueError("Data URL not base64")
-    raw = base64.b64decode(b64)
-    img = Image.open(BytesIO(raw))
-    return img.convert("RGB")
+def data_url_to_image(data_url: str):
+    raise NotImplementedError("Face recognition disabled")
 
 
 @app.get("/health")
@@ -302,58 +291,6 @@ async def login(payload: LoginPayload):
     if user.get("password") != payload.password:
         raise HTTPException(status_code=401, detail="Contraseña incorrecta")
 
-    stored_photo = user.get("photo")
-    if not stored_photo:
-        raise HTTPException(status_code=400, detail="No hay foto registrada para el usuario")
-
-    similarity = None
-    used_model = None
-    try:
-        img1 = data_url_to_image(stored_photo)
-        img2 = data_url_to_image(payload.photo)
-
-        try:
-            from deepface import DeepFace
-            models = ["ArcFace", "SFace", "Facenet512"]
-            for model_name in models:
-                try:
-                    res = DeepFace.verify(
-                        img1_path=pil_to_cv(img1),
-                        img2_path=pil_to_cv(img2),
-                        model_name=model_name,
-                        distance_metric="cosine",
-                        detector_backend="opencv",
-                        enforce_detection=True,
-                    )
-                    distance = float(res.get("distance", 1.0))
-                    similarity = max(0.0, min(1.0, 1.0 - distance))
-                    used_model = model_name
-                    break
-                except Exception:
-                    continue
-
-            if used_model is None:
-                raise ImportError("DeepFace models unavailable")
-
-            if similarity < 0.50:
-                raise HTTPException(status_code=401, detail=f"La foto no coincide (similaridad: {round(similarity*100)}%) [{used_model}]")
-        except ImportError:
-            if not detect_face(img1) or not detect_face(img2):
-                raise HTTPException(status_code=400, detail="No se detectó rostro en la foto enviada")
-            similarity = combined_hash_similarity(img1, img2)
-            if similarity < 0.50:
-                raise HTTPException(status_code=401, detail=f"La foto no coincide (similaridad: {round(similarity*100)}%)")
-        except Exception:
-            if not detect_face(img1) or not detect_face(img2):
-                raise HTTPException(status_code=400, detail="No se detectó rostro en la foto enviada")
-            similarity = combined_hash_similarity(img1, img2)
-            if similarity < 0.50:
-                raise HTTPException(status_code=401, detail=f"La foto no coincide (similaridad: {round(similarity*100)}%) ")
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error procesando foto: {str(e)}")
-
     results = {
         "userId": str(user.get("_id")),
         "name": user.get("name", "Usuario"),
@@ -362,10 +299,6 @@ async def login(payload: LoginPayload):
         "cedula": user.get("cedula", ""),
         "telefono": user.get("telefono", "")
     }
-    if similarity is not None:
-        results["similarity"] = round(similarity * 100, 2)
-        if used_model:
-            results["model"] = used_model
 
     return {"title": "Login exitoso", "results": results}
 
@@ -628,62 +561,6 @@ async def release_reservation(payload: ReleasePayload):
         query["session_id"] = payload.session_id
     deleted = reservations_coll.delete_one(query)
     return {"title": "OK", "results": {"released": deleted.deleted_count > 0}}
-
-
-def pil_to_cv(img: Image.Image):
-    import numpy as _np
-    arr = _np.array(img)
-    # RGB -> BGR para OpenCV/DeepFace
-    return arr[:, :, ::-1].copy()
-
-
-def detect_face(img: Image.Image) -> bool:
-    try:
-        import cv2
-        arr = pil_to_cv(img)
-        gray = cv2.cvtColor(arr, cv2.COLOR_BGR2GRAY)
-        cascade_path = getattr(cv2.data, 'haarcascades', '') + 'haarcascade_frontalface_default.xml'
-        face_cascade = cv2.CascadeClassifier(cascade_path)
-        faces = face_cascade.detectMultiScale(
-            gray, 
-            scaleFactor=1.05,
-            minNeighbors=3,
-            minSize=(30, 30),
-            flags=cv2.CASCADE_SCALE_IMAGE
-        )
-        return len(faces) > 0
-    except Exception:
-        import numpy as _np
-        g = _np.array(img.convert('L'))
-        mean = float(g.mean())
-        std = float(g.std())
-        if mean < 25 and std < 10:
-            return False
-        if std > 15 and 30 < mean < 200:
-            return True
-        return False
-
-
-def combined_hash_similarity(img1: Image.Image, img2: Image.Image) -> float:
-    h1p = imagehash.phash(img1)
-    h2p = imagehash.phash(img2)
-    dp = h1p - h2p
-    mp = h1p.hash.size
-    sp = max(0.0, min(1.0, 1.0 - (dp / float(mp))))
-
-    h1d = imagehash.dhash(img1)
-    h2d = imagehash.dhash(img2)
-    dd = h1d - h2d
-    md = h1d.hash.size
-    sd = max(0.0, min(1.0, 1.0 - (dd / float(md))))
-
-    h1a = imagehash.average_hash(img1)
-    h2a = imagehash.average_hash(img2)
-    da = h1a - h2a
-    ma = h1a.hash.size
-    sa = max(0.0, min(1.0, 1.0 - (da / float(ma))))
-
-    return (sp * 0.5) + (sd * 0.3) + (sa * 0.2)
 
 
 @app.get("/v1/user/search/{cedula}")

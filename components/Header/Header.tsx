@@ -89,13 +89,13 @@ const Header: React.FC = () => {
                   <DropdownItem url='members/tickets' text='Mis Tickets' />
                   <DropdownItem url='members/account' text='Mi Cuenta' />
                   <hr />
-                  <DropdownItem 
-                    url='#' 
-                    text='Desconectar' 
+                  <DropdownItem
+                    url='#'
+                    text='Desconectar'
                     onClick={() => {
                       logout();
                       setDropdown(false);
-                    }} 
+                    }}
                   />
                 </Dropdown>
               )}

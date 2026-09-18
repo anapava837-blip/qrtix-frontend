@@ -33,7 +33,9 @@ const Form: React.FC = () => {
   });
 
   // Validaciones
-  const { errors, validateSingleField, validateForm } = useFormValidation(commonValidationRules.passwordChange);
+  const { errors, validateSingleField, validateForm } = useFormValidation(
+    commonValidationRules.passwordChange
+  );
 
   /**
    * Handles the change event for input fields in the form.
@@ -133,7 +135,11 @@ const Form: React.FC = () => {
             required
             onChange={handleChange}
           />
-          {errors.password && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.password}</span>}
+          {errors.password && (
+            <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+              {errors.password}
+            </span>
+          )}
         </div>
         <div className='form-line'>
           <div className='label-line'>
@@ -148,7 +154,11 @@ const Form: React.FC = () => {
             required
             onChange={handleChange}
           />
-          {errors.newPassword && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.newPassword}</span>}
+          {errors.newPassword && (
+            <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+              {errors.newPassword}
+            </span>
+          )}
         </div>
         <div className='form-line'>
           <div className='label-line'>
@@ -163,7 +173,11 @@ const Form: React.FC = () => {
             required
             onChange={handleChange}
           />
-          {errors.newPasswordAgain && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.newPasswordAgain}</span>}
+          {errors.newPasswordAgain && (
+            <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+              {errors.newPasswordAgain}
+            </span>
+          )}
         </div>
         <div className='form-buttons'>
           <ButtonLink color='gray-overlay' text='Volver' url='members/account' />

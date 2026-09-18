@@ -27,9 +27,7 @@ const CardGroup: React.FC<CardGroupProps> = ({
           <Heading type={2} color={color} text={title} />
           {url && <ButtonLink url={url} text='Ver todos' color={color} />}
         </div>
-        <div className={gridClassName}>
-          {children}
-        </div>
+        <div className={gridClassName}>{children}</div>
       </div>
     </Section>
   );

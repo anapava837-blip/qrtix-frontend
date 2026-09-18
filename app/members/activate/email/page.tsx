@@ -14,7 +14,9 @@ const Page: React.FC = () => (
         <div className='center'>
           <Heading type={1} color='gray' text='Activación por correo electrónico' />
           <p className='gray form-information'>
-            Debes activar tu nueva dirección de correo electrónico con el código que te enviamos. Si no ves el correo en unos minutos, revisa tu carpeta de correo no deseado o spam. Puedes hacerlo más tarde con el enlace de tu correo.
+            Debes activar tu nueva dirección de correo electrónico con el código que te enviamos. Si
+            no ves el correo en unos minutos, revisa tu carpeta de correo no deseado o spam. Puedes
+            hacerlo más tarde con el enlace de tu correo.
           </p>
         </div>
         <Form />

@@ -11,7 +11,7 @@ import { getAllEvents } from '@data/events';
 
 const Page: React.FC = () => {
   const events = getAllEvents();
-  
+
   return (
     <Master>
       <Section className='white-background'>

@@ -12,14 +12,12 @@
     "prettier fix": "prettier --write **"
   },
   "dependencies": {
-    "@types/pdfmake": "^0.2.11",
     "axios": "^1.11.0",
     "base-64": "^1.0.0",
     "iconv-lite": "0.6.3",
+    "jspdf": "^2.5.2",
     "mongodb": "^6.3.0",
     "next": "15.5.7",
-    "pdfkit": "^0.16.0",
-    "pdfmake": "^0.2.18",
     "qrcode": "^1.5.3",
     "react": "19.1.1",
     "react-dom": "19.1.1"

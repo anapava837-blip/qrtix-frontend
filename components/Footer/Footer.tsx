@@ -24,7 +24,7 @@ const Footer: React.FC = () => (
           Mis Tickes
         </Link>
         <Link href='/members/account' className='white'>
-         Mi Cuenta
+          Mi Cuenta
         </Link>
       </div>
       <div className='links'>

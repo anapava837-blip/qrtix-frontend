@@ -14,7 +14,9 @@ const Page: React.FC = () => (
         <div className='center'>
           <Heading type={1} color='gray' text='Activación de cuenta' />
           <p className='gray form-information'>
-            Antes de iniciar sesión, debes activar tu cuenta con el código enviado a tu correo electrónico. Si no lo recibes en unos minutos, revisa tu carpeta de correo no deseado o spam. Puedes hacerlo más tarde con el enlace de tu correo electrónico.
+            Antes de iniciar sesión, debes activar tu cuenta con el código enviado a tu correo
+            electrónico. Si no lo recibes en unos minutos, revisa tu carpeta de correo no deseado o
+            spam. Puedes hacerlo más tarde con el enlace de tu correo electrónico.
           </p>
         </div>
         <Form />

@@ -11,11 +11,13 @@
 ### 1. Instalar Dependencias
 
 #### Frontend (Next.js)
+
 ```bash
 npm install
 ```
 
 #### Backend (FastAPI)
+
 ```bash
 cd backend
 pip install -r requirements.txt
@@ -26,12 +28,14 @@ pip install -r requirements.txt
 ### Opción 1: Scripts Automáticos (Recomendado)
 
 #### Windows (Batch)
+
 ```bash
 # Doble clic en el archivo o ejecutar desde terminal
 start-dev.bat
 ```
 
 #### PowerShell
+
 ```powershell
 # Ejecutar desde PowerShell
 ./start-dev.ps1
@@ -40,11 +44,13 @@ start-dev.bat
 ### Opción 2: Visual Studio Code
 
 #### Usando Tareas (Ctrl+Shift+P)
+
 1. Abrir Command Palette: `Ctrl+Shift+P`
 2. Escribir: `Tasks: Run Task`
 3. Seleccionar: `Iniciar Desarrollo Completo`
 
 #### Usando Debug (F5)
+
 1. Ir a la pestaña Debug (Ctrl+Shift+D)
 2. Seleccionar: `Iniciar Aplicación Completa`
 3. Presionar F5 o hacer clic en el botón play
@@ -52,12 +58,14 @@ start-dev.bat
 ### Opción 3: Manual (Terminal Integrado)
 
 #### Terminal 1 - Backend
+
 ```bash
 cd backend
 uvicorn main:app --reload --port 8001
 ```
 
 #### Terminal 2 - Frontend
+
 ```bash
 npm run dev
 ```
@@ -71,6 +79,7 @@ npm run dev
 ## 🔧 Configuración de VS Code
 
 ### Extensiones Recomendadas
+
 - Python
 - Pylance
 - ES7+ React/Redux/React-Native snippets
@@ -79,7 +88,9 @@ npm run dev
 - Thunder Client (para probar APIs)
 
 ### Configuración Automática
+
 El proyecto incluye configuración automática para VS Code:
+
 - `.vscode/settings.json` - Configuración del editor
 - `.vscode/tasks.json` - Tareas automatizadas
 - `.vscode/launch.json` - Configuración de debug
@@ -87,10 +98,12 @@ El proyecto incluye configuración automática para VS Code:
 ## 🐛 Solución de Problemas
 
 ### Error: "Failed to fetch"
+
 - Verificar que el backend esté ejecutándose en puerto 8001
 - Comprobar que las variables de entorno estén configuradas
 
 ### Error: Puerto en uso
+
 ```bash
 # Encontrar proceso usando el puerto
 netstat -ano | findstr :3000
@@ -101,6 +114,7 @@ taskkill /PID <PID> /F
 ```
 
 ### Error: Módulos no encontrados
+
 ```bash
 # Reinstalar dependencias frontend
 rm -rf node_modules package-lock.json
@@ -128,6 +142,7 @@ pip install -r requirements.txt --force-reinstall
 ## 🔐 Variables de Entorno
 
 El archivo `.env.local` contiene:
+
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8001
 MONGODB_URI=mongodb://localhost:27017/qrtixpro

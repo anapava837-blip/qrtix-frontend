@@ -116,7 +116,9 @@ export default function PurchasePage() {
   useEffect(() => {
     if (!expired || !purchaseData) return;
     const t = window.setTimeout(() => {
-      alert('⏰ Tu tiempo de reserva ha expirado.\n\nLos asientos han sido liberados. Por favor, inténtalo de nuevo.');
+      alert(
+        '⏰ Tu tiempo de reserva ha expirado.\n\nLos asientos han sido liberados. Por favor, inténtalo de nuevo.'
+      );
       const ev = purchaseData.event_id ? `/event/${purchaseData.event_id}` : '/event/1';
       window.location.href = ev;
     }, 300);
@@ -143,7 +145,11 @@ export default function PurchasePage() {
           <div className='container'>
             <Heading type={2} color='gray' text='Error' />
             <p>No se encontraron datos de compra. Por favor, regresa y selecciona tus asientos.</p>
-            <a className='button blue-filled' href='/event/1' style={{ marginTop: 20, display: 'inline-flex' }}>
+            <a
+              className='button blue-filled'
+              href='/event/1'
+              style={{ marginTop: 20, display: 'inline-flex' }}
+            >
               <span className='material-symbols-outlined left-icon'>arrow_back</span>
               Volver al evento
             </a>
@@ -174,7 +180,10 @@ export default function PurchasePage() {
             }}
           >
             <div className='countdown-icon'>
-              <span className='material-symbols-outlined' style={{ fontVariationSettings: "'FILL' 1, 'wght' 600" }}>
+              <span
+                className='material-symbols-outlined'
+                style={{ fontVariationSettings: "'FILL' 1, 'wght' 600" }}
+              >
                 {isUrgent ? 'error' : 'timer'}
               </span>
             </div>
@@ -189,8 +198,9 @@ export default function PurchasePage() {
                   <>Estamos liberando los asientos y te regresaremos...</>
                 ) : (
                   <>
-                    Completa el pago antes de que termine el tiempo. Si el reloj llega a <b>00:00</b>,
-                    tus asientos se liberarán automáticamente y otra persona podrá comprarlos.
+                    Completa el pago antes de que termine el tiempo. Si el reloj llega a{' '}
+                    <b>00:00</b>, tus asientos se liberarán automáticamente y otra persona podrá
+                    comprarlos.
                   </>
                 )}
               </div>

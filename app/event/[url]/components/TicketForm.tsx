@@ -217,7 +217,12 @@ const TicketForm: React.FC<IProps> = ({ data }) => {
       </div>
       <div className='ticket-box-buttons'>
         {formValues.length > 0 ? (
-          <Button type='submit' color='blue-filled' text='Comparar Ticket' rightIcon='arrow_forward' />
+          <Button
+            type='submit'
+            color='blue-filled'
+            text='Comparar Ticket'
+            rightIcon='arrow_forward'
+          />
         ) : (
           <Button type='submit' color='disabled' text='Entradas no encontradas' />
         )}

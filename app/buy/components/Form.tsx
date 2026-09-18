@@ -27,7 +27,9 @@ interface IFormProps {
 
 const Form: React.FC = () => {
   const { showAlert, hideAlert } = useAlert();
-  const { errors, validateSingleField, validateForm } = useFormValidation(commonValidationRules.purchase);
+  const { errors, validateSingleField, validateForm } = useFormValidation(
+    commonValidationRules.purchase
+  );
 
   const [loading, setLoading] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<IFormProps>({
@@ -112,8 +114,12 @@ const Form: React.FC = () => {
     >
       <div className='form-elements'>
         <div className='form-line padding-top'>
-          <Heading type={5} color='gray' text='
-            información del comprador' />
+          <Heading
+            type={5}
+            color='gray'
+            text='
+            información del comprador'
+          />
         </div>
         <div className='form-line'>
           <div className='flex flex-v-center flex-space-between'>
@@ -130,7 +136,11 @@ const Form: React.FC = () => {
                 required
                 onChange={handleChange}
               />
-              {errors.name && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.name}</span>}
+              {errors.name && (
+                <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                  {errors.name}
+                </span>
+              )}
             </div>
             <div className='two-line'>
               <div className='label-line'>
@@ -145,7 +155,11 @@ const Form: React.FC = () => {
                 required
                 onChange={handleChange}
               />
-              {errors.email && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.email}</span>}
+              {errors.email && (
+                <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                  {errors.email}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -167,7 +181,11 @@ const Form: React.FC = () => {
                 required
                 onChange={handleChange}
               />
-              {errors.cardName && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.cardName}</span>}
+              {errors.cardName && (
+                <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                  {errors.cardName}
+                </span>
+              )}
             </div>
             <div className='two-line'>
               <div className='label-line'>
@@ -182,7 +200,11 @@ const Form: React.FC = () => {
                 required
                 onChange={handleChange}
               />
-              {errors.cardNumber && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.cardNumber}</span>}
+              {errors.cardNumber && (
+                <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                  {errors.cardNumber}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -197,11 +219,15 @@ const Form: React.FC = () => {
                 name='cardExpiration'
                 value={formValues.cardExpiration}
                 maxLength={4}
-                placeholder="Ingrese la fecha de vencimiento de su tarjeta"
+                placeholder='Ingrese la fecha de vencimiento de su tarjeta'
                 required
                 onChange={handleChange}
               />
-              {errors.cardExpiration && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.cardExpiration}</span>}
+              {errors.cardExpiration && (
+                <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                  {errors.cardExpiration}
+                </span>
+              )}
             </div>
             <div className='two-line'>
               <div className='label-line'>
@@ -212,11 +238,15 @@ const Form: React.FC = () => {
                 name='cardCvc'
                 value={formValues.cardCvc}
                 maxLength={3}
-                placeholder="Ingrese el número de seguridad de su tarjeta"
+                placeholder='Ingrese el número de seguridad de su tarjeta'
                 required
                 onChange={handleChange}
               />
-              {errors.cardCvc && <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>{errors.cardCvc}</span>}
+              {errors.cardCvc && (
+                <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
+                  {errors.cardCvc}
+                </span>
+              )}
             </div>
           </div>
         </div>

@@ -15,13 +15,28 @@ interface IProps {
   color: string;
 }
 
-const MONTHS_ES = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+const MONTHS_ES = [
+  'ENE',
+  'FEB',
+  'MAR',
+  'ABR',
+  'MAY',
+  'JUN',
+  'JUL',
+  'AGO',
+  'SEP',
+  'OCT',
+  'NOV',
+  'DIC',
+];
 
 const parseDateBadge = (when: string) => {
   try {
     const d = new Date(when);
     if (isNaN(d.getTime())) {
-      const parts = String(when).trim().split(/[\s\-/]+/);
+      const parts = String(when)
+        .trim()
+        .split(/[\s\-/]+/);
       return {
         day: parts[0]?.slice(0, 2) || '?',
         month: (parts[1] || '').slice(0, 3).toUpperCase() || '---',

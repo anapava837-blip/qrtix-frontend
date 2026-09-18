@@ -45,11 +45,11 @@ const Page = async ({ params }: PageProps) => {
     return (
       <Master>
         <Section>
-          <div className="container">
-            <div className="center">
-              <Heading type={1} color="gray" text="Evento no encontrado" />
-              <p className="gray">El evento que estás buscando no existe o ha sido eliminado.</p>
-              <ButtonLink color="blue" text="Volver a eventos" url="/eventos" />
+          <div className='container'>
+            <div className='center'>
+              <Heading type={1} color='gray' text='Evento no encontrado' />
+              <p className='gray'>El evento que estás buscando no existe o ha sido eliminado.</p>
+              <ButtonLink color='blue' text='Volver a eventos' url='/eventos' />
             </div>
           </div>
         </Section>
@@ -64,7 +64,7 @@ const Page = async ({ params }: PageProps) => {
           style={{
             backgroundImage: `url("${event.image}")`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundPosition: 'center',
           }}
           className='event-cover cover-image flex flex-v-center flex-h-center'
         />
@@ -73,7 +73,7 @@ const Page = async ({ params }: PageProps) => {
             style={{
               backgroundImage: `url("${event.image}")`,
               backgroundSize: 'cover',
-              backgroundPosition: 'center'
+              backgroundPosition: 'center',
             }}
             className='cover-image image'
           />
@@ -88,7 +88,7 @@ const Page = async ({ params }: PageProps) => {
           <div className='event-details'>
             <div className='row'>
               <div className='col-md-8'>
-                <Box className="content-box">
+                <Box className='content-box'>
                   <Heading type={4} color='gray' text='Detalles del Evento' />
                   <div className='paragraph-container gray'>
                     <p style={{ whiteSpace: 'pre-line', lineHeight: '1.6', fontSize: '16px' }}>
@@ -97,24 +97,24 @@ const Page = async ({ params }: PageProps) => {
                   </div>
                 </Box>
 
-                <Box className="info-box mt-20">
+                <Box className='info-box mt-20'>
                   <div className='info-details'>
                     <div className='info-item'>
-                      <span className="material-symbols-outlined">calendar_month</span>
+                      <span className='material-symbols-outlined'>calendar_month</span>
                       <div>
                         <Heading type={6} color='gray' text='Fecha y Hora' />
                         <p className='gray'>{event.date}</p>
                       </div>
                     </div>
                     <div className='info-item'>
-                      <span className="material-symbols-outlined">location_on</span>
+                      <span className='material-symbols-outlined'>location_on</span>
                       <div>
                         <Heading type={6} color='gray' text='Ubicación' />
                         <p className='gray'>{event.location}</p>
                       </div>
                     </div>
                     <div className='info-item'>
-                      <span className="material-symbols-outlined">payments</span>
+                      <span className='material-symbols-outlined'>payments</span>
                       <div>
                         <Heading type={6} color='gray' text='Precio' />
                         <p className='gray'>{event.price}</p>
@@ -124,16 +124,19 @@ const Page = async ({ params }: PageProps) => {
                 </Box>
 
                 <div className='buttons-container' style={{ marginTop: '30px' }}>
-                  <ButtonLink color="gray-overlay" text="Volver a eventos" url="/news" />
+                  <ButtonLink color='gray-overlay' text='Volver a eventos' url='/news' />
                 </div>
               </div>
 
               <div className='col-md-4'>
-                <Box className="ticket-box">
+                <Box className='ticket-box'>
                   <Heading type={4} color='gray' text='Más Información' />
-                  <p className="gray">Para más información sobre este evento, contáctanos a través de nuestra página de contacto.</p>
-                  <div className="mt-20">
-                    <ButtonLink color="blue" text="Contactar" url="/contact" />
+                  <p className='gray'>
+                    Para más información sobre este evento, contáctanos a través de nuestra página
+                    de contacto.
+                  </p>
+                  <div className='mt-20'>
+                    <ButtonLink color='blue' text='Contactar' url='/contact' />
                   </div>
                 </Box>
               </div>
@@ -142,11 +145,7 @@ const Page = async ({ params }: PageProps) => {
         </div>
       </Section>
 
-      <CardGroup
-        title="Eventos relacionados"
-        color={event.color}
-        gridClassName="events-grid"
-      >
+      <CardGroup title='Eventos relacionados' color={event.color} gridClassName='events-grid'>
         {Object.entries(newsData)
           .filter(([id]) => id !== eventId)
           .slice(0, 3)
@@ -159,8 +158,7 @@ const Page = async ({ params }: PageProps) => {
               name={relatedEvent.title}
               image={relatedEvent.image}
             />
-          ))
-        }
+          ))}
       </CardGroup>
     </Master>
   );
