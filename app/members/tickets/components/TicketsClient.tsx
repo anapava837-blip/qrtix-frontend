@@ -112,31 +112,74 @@ const TicketsClient: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [debug, setDebug] = useState<string[]>([]);
+  const [bypassUserLoading, setBypassUserLoading] = useState<boolean>(false);
   const didRunRef = useRef<boolean>(false);
   const timersRef = useRef<number[]>([]);
+  const hydrationStartRef = useRef<number>(typeof performance !== 'undefined' ? performance.now() : Date.now());
 
   const pushDebug = (m: string) => {
     const t = new Date().toLocaleTimeString('es-CO', { hour12: false });
     const line = `[${t}] ${m}`;
     console.log('[MisTickets]', line);
-    setDebug((prev) => [...prev.slice(-12), line]);
+    setDebug((prev) => [...prev.slice(-14), line]);
   };
 
   const clearTimers = () => {
     timersRef.current.forEach((t) => {
       try { clearTimeout(t as unknown as ReturnType<typeof setTimeout>); } catch (_) {}
+      try { clearInterval(t as unknown as ReturnType<typeof setInterval>); } catch (_) {}
     });
     timersRef.current = [];
   };
 
+  // ============================================================
+  // RED DE SEGURIDAD: userLoading NUNCA mas de 2500ms pegado.
+  // Si UserProvider se atasca (SSR/hidratacion/StrictMode), forzamos continuar.
+  // ============================================================
+  useEffect(() => {
+    if (!userLoading || bypassUserLoading) return;
+
+    let ticks = 0;
+    const tick = window.setInterval(() => {
+      ticks += 1;
+      const elapsed =
+        typeof performance !== 'undefined'
+          ? Math.round(performance.now() - hydrationStartRef.current)
+          : ticks * 500;
+      pushDebug(
+        `SIGUE ESPERANDO userLoading=true... ${elapsed}ms transcurridos (user=${
+          user ? 'cargado' : 'null'
+        }, bypass=${String(bypassUserLoading)})`
+      );
+    }, 500);
+    timersRef.current.push(tick as unknown as number);
+
+    const maxWait = window.setTimeout(() => {
+      setBypassUserLoading(true);
+      pushDebug(
+        '⚠️ ⚠️ ⚠️  TIMEOUT HIDRATACION: Pasaron 2500ms y isLoading seguia true. Forzando continuar (bypassUserLoading=true). Si el usuario sigue en null, vuelve a iniciar sesion manualmente.'
+      );
+    }, 2500);
+    timersRef.current.push(maxWait as unknown as number);
+
+    return () => {
+      try { clearInterval(tick); } catch (_) {}
+      try { clearTimeout(maxWait); } catch (_) {}
+    };
+  }, [userLoading, bypassUserLoading, user]);
+
+  const hydrated = !userLoading || bypassUserLoading;
+
   useEffect(() => {
     pushDebug(
-      `Render userLoading=${String(userLoading)}, user=${
-        user ? `yes (${user.email || user.cedula || 'sin-email'})` : 'null'
-      }, didRunRef=${String(didRunRef.current)}`
+      `Render userLoading=${String(userLoading)}, bypass=${String(bypassUserLoading)}, hydrated=${String(
+        hydrated
+      )}, user=${user ? `yes (${user.email || user.cedula || 'sin-email'})` : 'null'}, didRunRef=${String(
+        didRunRef.current
+      )}`
     );
 
-    if (userLoading) return;
+    if (!hydrated) return;
 
     if (!user) {
       pushDebug('Sin usuario → redirigiendo a signin.');
@@ -559,15 +602,23 @@ const TicketsClient: React.FC = () => {
 
   const showDebug = true;
 
-  if (userLoading) {
+  if (!hydrated) {
     return (
       <Master>
         <Section className='white-background'>
           <div className='container'>
             <Loader type='inline' color='gray' text='Verificando sesión...' />
-            {showDebug && (
-              <DebugPanel lines={debug} title='Depuración' />
-            )}
+            <div
+              style={{
+                textAlign: 'center',
+                marginTop: 14,
+                color: 'var(--gray, #64748b)',
+                fontSize: '0.9rem',
+              }}
+            >
+              Si esta pantalla dura más de 3 segundos, el sistema continuará automáticamente.
+            </div>
+            {showDebug && <DebugPanel lines={debug} title='Depuración' />}
           </div>
         </Section>
       </Master>

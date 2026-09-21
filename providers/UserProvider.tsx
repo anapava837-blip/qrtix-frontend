@@ -9,37 +9,68 @@ const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const markReady = () => {
+    try {
+      setIsLoading((prev) => (prev ? false : prev));
+    } catch (_) {}
+  };
+
   // Cargar datos del usuario desde localStorage al inicializar
   useEffect(() => {
+    let cancelled = false;
     try {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        const userData = JSON.parse(storedUser);
-        setUser(userData);
-        setIsAuthenticated(true);
+      const storedUser =
+        (typeof window !== 'undefined' && window.localStorage && window.localStorage.getItem('user')) ||
+        null;
+      if (storedUser && !cancelled) {
+        try {
+          const userData = JSON.parse(storedUser);
+          setUser(userData);
+          setIsAuthenticated(true);
+        } catch (e) {
+          console.error('Error parsing stored user data:', e);
+          try {
+            window.localStorage.removeItem('user');
+          } catch (_) {}
+        }
       }
     } catch (error) {
-      console.error('Error parsing stored user data:', error);
-      try {
-        localStorage.removeItem('user');
-      } catch (_) {}
+      console.error('UserProvider localStorage read error:', error);
     } finally {
-      setIsLoading(false);
+      if (!cancelled) {
+        markReady();
+      }
     }
+
+    // Backup: si hidratacion se atasca por cualquier motivo (SSR / React 18 Strict / suspension),
+    // forzamos que isLoading pase a false a los 1200ms COMO MINIMO (nunca se queda pegado).
+    const t = window.setTimeout(() => {
+      cancelled = true;
+      markReady();
+    }, 1200);
+
+    return () => {
+      cancelled = true;
+      try { clearTimeout(t); } catch (_) {}
+    };
   }, []);
 
   const login = (userData: IUser) => {
     setUser(userData);
     setIsAuthenticated(true);
-    setIsLoading(false);
-    localStorage.setItem('user', JSON.stringify(userData));
+    markReady();
+    try {
+      localStorage.setItem('user', JSON.stringify(userData));
+    } catch (_) {}
   };
 
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    setIsLoading(false);
-    localStorage.removeItem('user');
+    markReady();
+    try {
+      localStorage.removeItem('user');
+    } catch (_) {}
   };
 
   const contextValue: IUserContext = {
