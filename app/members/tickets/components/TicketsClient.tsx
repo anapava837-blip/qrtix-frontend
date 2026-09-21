@@ -120,6 +120,13 @@ const TicketsClient: React.FC = () => {
     }
 
     let cancelled = false;
+    let maxTimer: ReturnType<typeof setTimeout> | null = setTimeout(() => {
+      if (!cancelled) {
+        console.warn('[MisTickets] Tiempo máximo de espera alcanzado.');
+        setErrorMsg('Tiempo de espera agotado. Verifica tu conexión e intenta de nuevo.');
+        setLoading(false);
+      }
+    }, 10000);
 
     const loadSales = async () => {
       setLoading(true);
@@ -153,6 +160,7 @@ const TicketsClient: React.FC = () => {
           setErrorMsg(err?.message || 'Error al conectar con el servidor.');
         }
       } finally {
+        if (maxTimer) { clearTimeout(maxTimer); maxTimer = null; }
         if (!cancelled) setLoading(false);
       }
     };
@@ -161,8 +169,9 @@ const TicketsClient: React.FC = () => {
 
     return () => {
       cancelled = true;
+      if (maxTimer) { clearTimeout(maxTimer); maxTimer = null; }
     };
-  }, [user, router]);
+  }, [user, router, isLoading]);
 
   const handleDownloadPdf = async (sale: ISale) => {
     try {
@@ -482,7 +491,7 @@ const TicketsClient: React.FC = () => {
     }
   };
 
-  if (isLoading || !user && isLoading) {
+  if (isLoading) {
     return (
       <Master>
         <Section className='white-background'>
