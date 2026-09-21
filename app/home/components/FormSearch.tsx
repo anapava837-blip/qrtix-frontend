@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 // hooks
 import useAlert from '@hooks/useAlert';
@@ -15,16 +16,12 @@ interface IFormProps {
 
 const FormSearch: React.FC = () => {
   const { showAlert } = useAlert();
+  const router = useRouter();
 
   const [formValues, setFormValues] = useState<IFormProps>({
     keyword: '',
   });
 
-  /**
-   * Handles the change event for form inputs.
-   *
-   * @param {React.ChangeEvent<HTMLInputElement>} e - The event object from the input change.
-   */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
 
@@ -34,25 +31,20 @@ const FormSearch: React.FC = () => {
     });
   };
 
-  /**
-   * Handles the form submission event.
-   *
-   * Prevents the default form submission behavior, checks if the keyword input is valid (minimum 3 characters),
-   * and displays an error alert if the input is invalid.
-   *
-   * @param {React.FormEvent<HTMLFormElement>} e - The event object from the form submission.
-   */
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
     const { keyword } = formValues;
 
-    if (keyword === '' || keyword.length < 3) {
+    if (keyword === '' || keyword.length < 2) {
       showAlert({
         type: 'error',
-        text: 'Por favor, introduzca un mínimo de 3 caracteres para la búsqueda..',
+        text: 'Por favor, introduzca al menos 2 caracteres para buscar.',
       });
+      return;
     }
+
+    router.push(`/list?q=${encodeURIComponent(keyword.trim())}`);
   };
 
   return (
@@ -67,7 +59,7 @@ const FormSearch: React.FC = () => {
           required
           onChange={handleChange}
         />
-        <button type='submit'>
+        <button type='submit' aria-label='Buscar'>
           <span className='material-symbols-outlined'>Buscar</span>
         </button>
       </div>

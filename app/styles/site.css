@@ -2163,3 +2163,277 @@ td {
     padding: 0 6px !important;
   }
 }
+
+/* ============================================================
+   📱 FIXES RESPONSIVE QRTixPro (parches finales móvil)
+   ============================================================ */
+
+/* Evitar scroll horizontal global */
+html,
+body {
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* === FIX: Busqueda inline (list page) en móvil ===
+   Los botones DENTRO de .search-inputs NO deben ser 100% width
+   (rompe el layout input+boton horizontal) */
+@media (max-width: 800px) {
+  .top-search {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 10px !important;
+    margin: 0 auto 24px auto !important;
+  }
+
+  .top-search .search-inputs {
+    flex-direction: row !important;
+    gap: 8px !important;
+    padding: 5px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .top-search .search-inputs input {
+    width: auto !important;
+    min-width: 0;
+    flex: 1 !important;
+    padding: 10px 8px !important;
+    font-size: 0.95em !important;
+  }
+
+  /* Excepcion CRITICA: botones dentro del search NO son 100% */
+  .top-search .search-inputs .button,
+  .top-search .search-inputs button.button,
+  .top-search .search-inputs button {
+    width: auto !important;
+    max-width: none !important;
+    flex-shrink: 0 !important;
+    padding: 10px 12px !important;
+    font-size: 0.9em !important;
+    min-width: auto !important;
+  }
+
+  .top-search .search-inputs .button .left-icon,
+  .top-search .search-inputs button .left-icon {
+    display: none !important;
+  }
+
+  /* Fix fila resultados "Limpiar busqueda" + texto */
+  .top-search + div,
+  section .container > div[style*='text-align: center'] {
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 500px) {
+  .top-search .search-inputs {
+    padding: 4px !important;
+    gap: 4px !important;
+  }
+
+  .top-search .search-inputs input {
+    padding: 9px 6px !important;
+    font-size: 0.9em !important;
+  }
+
+  .top-search .search-inputs button {
+    padding: 9px 10px !important;
+    font-size: 0.85em !important;
+  }
+}
+
+/* === FIX: TICKET-ITEM responsive mejorado === */
+@media (max-width: 800px) {
+  .ticket-item {
+    flex-direction: column-reverse !important;
+    gap: 0 !important;
+    margin-bottom: 20px !important;
+    overflow: hidden;
+  }
+
+  .ticket-item .item-right {
+    width: 100% !important;
+    padding: 16px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    text-align: left !important;
+    border: none !important;
+  }
+
+  .ticket-item .item-right h2 {
+    margin: 0 !important;
+    font-size: 1.8em !important;
+  }
+
+  .ticket-item .item-right p {
+    margin: 0 !important;
+  }
+
+  .ticket-item .item-right strong {
+    margin: 0 !important;
+    font-size: 0.9em !important;
+  }
+
+  .ticket-item .item-right .material-symbols-outlined {
+    font-size: 2em !important;
+    margin: 0 10px !important;
+  }
+
+  .ticket-item .item-left {
+    width: 100% !important;
+    padding: 20px !important;
+    text-align: left !important;
+  }
+
+  .ticket-item .item-left h5 {
+    font-size: 1.1em !important;
+  }
+
+  .ticket-item .item-left .actions {
+    justify-content: flex-start !important;
+    margin-top: 16px !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+
+  .ticket-item .item-left .actions a {
+    width: auto !important;
+    height: auto !important;
+    padding: 10px 14px !important;
+    border-radius: var(--r-md, 12px) !important;
+    background: var(--ink-50, #f8fafc) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 0.9em !important;
+    text-decoration: none !important;
+  }
+
+  .ticket-item .item-left .actions a::after {
+    content: attr(title);
+    color: var(--dark-gray, #64748b);
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 500px) {
+  .ticket-item {
+    margin-bottom: 16px !important;
+  }
+
+  .ticket-item .item-right {
+    padding: 12px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .ticket-item .item-left {
+    padding: 16px !important;
+  }
+}
+
+/* === FIX: FORMS 2-col grid collapse (purchase etc) === */
+@media (max-width: 800px) {
+  .two-line,
+  .form-line.two-line,
+  [class*='two-line'] {
+    flex-direction: column !important;
+    gap: 14px !important;
+  }
+
+  .two-line > div,
+  .form-line.two-line > div,
+  .purchase-grid > div {
+    width: 100% !important;
+    padding: 0 !important;
+  }
+}
+
+/* === FIX: BUTTONS - NO expandir los de icono solitario o toolbar === */
+@media (max-width: 800px) {
+  .actions .button,
+  .cta-buttons .button,
+  .button-container .button,
+  button.icon-only {
+    width: auto !important;
+    max-width: none !important;
+  }
+}
+
+/* === FIX: CONTAINERS - padding horizontal max móvil === */
+@media (max-width: 800px) {
+  .container {
+    padding: 0 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  section {
+    padding: 24px 0 !important;
+  }
+}
+
+/* === FIX: BUTTON GROUP responsive === */
+@media (max-width: 600px) {
+  .button-group {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .button-group > a,
+  .button-group > button {
+    width: 100% !important;
+    border-radius: var(--r-md) !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  }
+}
+
+/* === FIX: PURCHASE FORM / CHECKOUT responsive === */
+@media (max-width: 800px) {
+  .purchase-complete {
+    padding: 24px 14px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .purchase-complete .action-buttons {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  .purchase-complete .action-buttons button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* === FIX: HERO content spacing === */
+@media (max-width: 600px) {
+  .hero-content h1 {
+    margin-bottom: 12px !important;
+  }
+
+  .cta-buttons {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .cta-buttons .button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}

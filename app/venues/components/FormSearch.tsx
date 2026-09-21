@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 // hooks
 import useAlert from '@hooks/useAlert';
@@ -14,15 +15,12 @@ interface IFormProps {
 
 const FormSearch: React.FC = () => {
   const { showAlert } = useAlert();
+  const router = useRouter();
 
   const [formValues, setFormValues] = useState<IFormProps>({
     keyword: '',
   });
 
-  /**
-   * Handle change in the form input
-   * @param {React.ChangeEvent<HTMLInputElement>} e - The event object
-   */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
 
@@ -32,21 +30,17 @@ const FormSearch: React.FC = () => {
     });
   };
 
-  /**
-   * Handles the form submission event.
-   * Prevents the default form submission behavior and checks if the keyword input is valid.
-   * If the keyword is empty or less than 3 characters, it displays an error alert.
-   *
-   * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
-   */
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
     const { keyword } = formValues;
 
-    if (keyword === '' || keyword.length < 3) {
-      showAlert({ type: 'error', text: 'Please enter minimum 3 characters for search.' });
+    if (keyword === '' || keyword.length < 2) {
+      showAlert({ type: 'error', text: 'Por favor, introduzca al menos 2 caracteres para buscar.' });
+      return;
     }
+
+    router.push(`/list?q=${encodeURIComponent(keyword.trim())}`);
   };
 
   return (
@@ -57,11 +51,11 @@ const FormSearch: React.FC = () => {
           name='keyword'
           value={formValues.keyword}
           maxLength={64}
-          placeholder='Venue name, keyword, location'
+          placeholder='Nombre evento, lugar, ubicación'
           required
           onChange={handleChange}
         />
-        <button type='submit'>
+        <button type='submit' aria-label='Buscar'>
           <span className='material-symbols-outlined'>search</span>
         </button>
       </div>

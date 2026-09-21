@@ -751,6 +751,54 @@ async def create_sale(purchase: PurchaseData):
         raise HTTPException(status_code=500, detail=f"Error al procesar la compra: {str(e)}")
 
 
+@app.get("/api/sales/user")
+async def get_user_sales(email: Optional[str] = None, documentNumber: Optional[str] = None):
+    """Obtener todas las compras de un usuario por email O por número de documento (cédula)."""
+    if client is None:
+        raise HTTPException(status_code=500, detail="Config error: MONGO_URI not set or invalid")
+
+    if not email and not documentNumber:
+        raise HTTPException(
+            status_code=400,
+            detail="Se requiere al menos uno de los parámetros: email o documentNumber"
+        )
+
+    try:
+        db = client[DB_NAME]
+        sales_collection = db[SALES_COLLECTION]
+
+        query: Dict[str, Any] = {"status": "completed"}
+        or_conditions: List[Dict[str, Any]] = []
+
+        if email:
+            or_conditions.append({"email": {"$regex": f"^{email}$", "$options": "i"}})
+        if documentNumber:
+            or_conditions.append({"documentNumber": documentNumber})
+
+        if or_conditions:
+            query["$or"] = or_conditions
+
+        cursor = sales_collection.find(query).sort("createdAt", -1)
+        results = []
+        for doc in list(cursor):
+            normalized = dict(doc)
+            if "_id" in normalized:
+                normalized["_id"] = str(normalized["_id"])
+            for date_field in ("createdAt", "updatedAt"):
+                if date_field in normalized and isinstance(normalized[date_field], datetime.datetime):
+                    normalized[date_field] = normalized[date_field].isoformat()
+            results.append(normalized)
+
+        return {
+            "title": "OK",
+            "results": results,
+        }
+
+    except Exception as e:
+        logger.error(f"Error al obtener ventas de usuario: {e}")
+        raise HTTPException(status_code=500, detail=f"Error al obtener compras: {str(e)}")
+
+
 @app.post("/api/generate-tickets")
 async def generate_tickets(request: Request):
     """Generate PDF tickets for a purchase"""

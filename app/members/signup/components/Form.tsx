@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // hooks
 import useAlert from '@hooks/useAlert';
 import { useFormValidation, commonValidationRules } from '@hooks/useFormValidation';
+import useUser from '@hooks/useUser';
 
 // components
 import Input from '@components/Form/Input';
-import Switch from '@components/Form/Switch';
 import Button from '@components/Button/Button';
 import Loader from '@components/Loader/Loader';
 
@@ -19,7 +19,6 @@ import Request, { type IRequest, type IResponse } from '@utils/Request';
 
 // interfaces
 interface IFormProps {
-  tos: boolean;
   name: string;
   email: string;
   lastname: string;
@@ -30,6 +29,8 @@ interface IFormProps {
 
 const Form: React.FC = () => {
   const { showAlert, hideAlert } = useAlert();
+  const { login } = useUser();
+  const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -40,16 +41,10 @@ const Form: React.FC = () => {
     password: '',
     cedula: '',
     telefono: '',
-    tos: false,
   });
 
   const { errors, validateForm, validateSingleField, clearFieldError } = useFormValidation({
     ...commonValidationRules.signup,
-    tos: {
-      custom: (value: string) => {
-        return formValues.tos ? null : 'Debe aceptar los términos y condiciones';
-      },
-    },
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -64,21 +59,6 @@ const Form: React.FC = () => {
       validateSingleField(name, value, { ...formValues, [name]: value });
     } else {
       clearFieldError(name);
-    }
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, checked } = e.target;
-
-    setFormValues({
-      ...formValues,
-      [name]: checked,
-    });
-
-    if (name === 'tos') {
-      if (checked) {
-        clearFieldError('tos');
-      }
     }
   };
 
@@ -106,7 +86,6 @@ const Form: React.FC = () => {
         telefono: formValues.telefono,
         email: formValues.email,
         password: formValues.password,
-        tos: formValues.tos,
       },
     };
 
@@ -115,9 +94,27 @@ const Form: React.FC = () => {
     const { status, data } = req;
 
     if (status === 200) {
-      window.location.href = '/members/activate/account';
+      const insertedId = data?.results?.insertedId ?? 'temp-id';
+
+      const userData = {
+        id: insertedId,
+        name: formValues.name,
+        lastname: formValues.lastname,
+        email: formValues.email,
+        photo: '',
+        cedula: formValues.cedula,
+        telefono: formValues.telefono,
+      };
+
+      login(userData);
+
+      showAlert({ type: 'success', text: '¡Registro exitoso! Bienvenido a QRTixPro' });
+
+      setTimeout(() => {
+        router.push('/');
+      }, 1500);
     } else {
-      showAlert({ type: 'error', text: data.title ?? '' });
+      showAlert({ type: 'error', text: data.title ?? 'Error al crear la cuenta' });
     }
 
     setLoading(false);
@@ -298,29 +295,9 @@ const Form: React.FC = () => {
             </span>
           )}
         </div>
-        <div className='form-line'>
-          <div className='label-line'>
-            <label htmlFor='tos'>Acuerdos</label>
-          </div>
-          <Switch name='tos' color='blue' onChange={handleCheckboxChange}>
-            Estoy de acuerdo con el{' '}
-            <Link href='/legal/privacy-policy' className='blue'>
-              Política de privacidad
-            </Link>{' '}
-            y{' '}
-            <Link href='/legal/terms-of-service' className='blue'>
-              TOS
-            </Link>
-          </Switch>
-          {errors.tos && (
-            <span className='error-text' style={{ color: 'red', fontSize: '12px' }}>
-              {errors.tos}
-            </span>
-          )}
-        </div>
 
         <div className='form-buttons'>
-          <Button type='submit' color='blue-filled' text='Inscribirse' />
+          <Button type='submit' color='blue-filled' text='Crear cuenta' />
         </div>
       </div>
     </form>
