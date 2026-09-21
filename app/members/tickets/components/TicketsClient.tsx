@@ -106,13 +106,14 @@ const formatMoney = (v: number | undefined) => {
 
 const TicketsClient: React.FC = () => {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
 
   const [sales, setSales] = useState<ISale[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string>('');
 
   useEffect(() => {
+    if (isLoading) return;
     if (!user) {
       router.replace('/members/signin');
       return;
@@ -481,7 +482,7 @@ const TicketsClient: React.FC = () => {
     }
   };
 
-  if (!user) {
+  if (isLoading || !user && isLoading) {
     return (
       <Master>
         <Section className='white-background'>

@@ -16,6 +16,7 @@ export interface IUser {
 export interface IUserContext {
   user: IUser | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (userData: IUser) => void;
   logout: () => void;
 }
@@ -23,6 +24,7 @@ export interface IUserContext {
 export const initialState: IUserContext = {
   user: null,
   isAuthenticated: false,
+  isLoading: true,
   login: () => {},
   logout: () => {},
 };
