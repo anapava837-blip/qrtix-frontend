@@ -648,7 +648,11 @@ const TicketsClient: React.FC = () => {
     }
   };
 
-  const showDebug = true;
+  // ============================================================
+  // Panel de depuración. Configurar a 'false' para ocultarlo completamente en producción.
+  // Se conserva el código en console.log() para depurar desde DevTools F12 si hace falta.
+  // ============================================================
+  const showDebug = false;
 
   if (!hydrated) {
     return (

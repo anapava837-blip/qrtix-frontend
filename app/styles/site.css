@@ -2437,3 +2437,312 @@ video {
     justify-content: center !important;
   }
 }
+
+/* ============================================================
+   📱📱📱 OPTIMIZACIÓN GLOBAL PARA TODOS LOS CELULARES
+   (iPhone SE/mini/Pro Max, Xiaomi, Motorola, Samsung, cualquier Android)
+   Breakpoints: 380px, 360px, 320px — lo más compacto del mercado.
+   ============================================================ */
+
+/* Fix VIEWPORT global: no permitir zoom accidental, ajuste a DPR iPhone/Android */
+@viewport {
+  width: device-width;
+  zoom: 1.0;
+  max-zoom: 1.0;
+  user-zoom: fixed;
+}
+
+/* Fuente relativa, no se rompe en pantallas con densidad rara */
+@media (max-width: 900px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.15);
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Botones y links: ancho mínimo para dedo (44px recomendado Apple / Material) */
+  button,
+  .button,
+  a.button,
+  .button-group > a,
+  .button-group > button {
+    min-height: 44px;
+    min-width: 44px;
+    line-height: 1.15;
+  }
+  /* Evitar texto horizontal overflow en tickets, info, etc. */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  li,
+  span,
+  label,
+  strong {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+/* === Mis Tickets: responsive perfecto === */
+@media (max-width: 700px) {
+  /* Header Mis Tickets: achicar titulo + acortar parrafo info */
+  .members-tickets-title,
+  .center > h1 {
+    font-size: 1.7rem !important;
+    line-height: 1.2 !important;
+  }
+  .form-information,
+  .center > p.form-information {
+    padding: 0 6px !important;
+    font-size: 0.95em !important;
+    line-height: 1.5 !important;
+  }
+}
+
+/* Paneles de estado (vacio/error/sesion-nodetectada) en movil */
+@media (max-width: 600px) {
+  .members-empty,
+  .members-error,
+  .members-sesion-panel,
+  .ticket-empty-card,
+  .ticket-error-card,
+  .ticket-session-panel,
+  section .container > div[class='center'][style*='padding:'] {
+    padding: 28px 16px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  section .container > div[class='center'][style*='padding:'] .material-symbols-outlined {
+    font-size: 2.8rem !important;
+  }
+  section .container > div[class='center'][style*='padding:'] > h3 {
+    font-size: 1.25rem !important;
+    margin-top: 6px !important;
+  }
+  section .container > div[class='center'][style*='padding:'] > div[style*='display: flex'] {
+    flex-direction: column !important;
+    width: 100% !important;
+    align-items: stretch !important;
+  }
+  section .container > div[class='center'][style*='padding:'] > div[style*='display: flex'] > a,
+  section .container > div[class='center'][style*='padding:'] > div[style*='display: flex'] > button {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+}
+
+/* Tamaño celulares pequeños (iPhone SE, Xiaomi Redmi, Motorola E) */
+@media (max-width: 420px) {
+  .container {
+    padding: 0 10px !important;
+  }
+  section {
+    padding: 18px 0 !important;
+  }
+  .center > h1 {
+    font-size: 1.5rem !important;
+  }
+  /* Ticket-item en pantallas MUY cortas: achicar fechas y texto */
+  .ticket-item .item-right h2 {
+    font-size: 1.55em !important;
+  }
+  .ticket-item .item-right p {
+    font-size: 0.9em !important;
+  }
+  .ticket-item .item-right .material-symbols-outlined {
+    font-size: 1.7em !important;
+    margin: 0 6px !important;
+  }
+  .ticket-item .item-right strong {
+    font-size: 0.85em !important;
+  }
+  .ticket-item .item-left {
+    padding: 14px !important;
+  }
+  .ticket-item .item-left h5 {
+    font-size: 1.02em !important;
+  }
+  .ticket-item .item-left p {
+    font-size: 0.9em !important;
+  }
+  .ticket-item .item-left .actions {
+    margin-top: 12px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .ticket-item .item-left .actions > button,
+  .ticket-item .item-left .actions > a,
+  .ticket-item .item-left .actions .button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 12px 14px !important;
+    font-size: 0.95em !important;
+  }
+  /* Buscador inline listado top */
+  .top-search .search-inputs input {
+    font-size: 0.9em !important;
+    padding: 9px 6px !important;
+  }
+  .top-search .search-inputs button {
+    padding: 9px !important;
+    font-size: 0.85em !important;
+  }
+  /* Loader grande en movil */
+  .loader-inline-ctn {
+    padding: 40px 10px !important;
+  }
+}
+
+/* Extra-pequeño: iPhone SE (generación 2/3) 375px, Galaxy A04e etc. */
+@media (max-width: 380px) {
+  .container {
+    padding: 0 8px !important;
+  }
+  section {
+    padding: 14px 0 !important;
+  }
+  .center > h1 {
+    font-size: 1.35rem !important;
+  }
+  .form-information {
+    font-size: 0.88em !important;
+    margin-top: 6px !important;
+  }
+  .ticket-item .item-right {
+    padding: 10px !important;
+    gap: 6px !important;
+  }
+  .ticket-item .item-right h2 {
+    font-size: 1.4em !important;
+  }
+  .ticket-item .item-right .material-symbols-outlined {
+    font-size: 1.6em !important;
+  }
+  .ticket-item .item-left {
+    padding: 12px !important;
+  }
+  /* Button-group Mis Tickets / Mi Cuenta en columna total (por si era row antes) */
+  .button-group {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  .button-group a,
+  .button-group button {
+    width: 100% !important;
+    border-radius: var(--r-md) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-right: none !important;
+  }
+  /* Formularios campos stacked padding pequeño */
+  .form-line input,
+  .form-line select,
+  .two-line > div input,
+  .two-line > div select {
+    padding: 11px 10px !important;
+    font-size: 0.95em !important;
+  }
+  /* Buttons en mobile: 100% ancho (menos los del search) */
+  section .button-container + * .button:not(.top-search *) {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .cta-buttons .button {
+    padding: 12px 14px !important;
+    font-size: 1em !important;
+  }
+  /* Tarjetas vacías / error */
+  section .container > div[class='center'][style*='padding:'] {
+    padding: 22px 14px !important;
+  }
+  section .container > div[class='center'][style*='padding:'] .material-symbols-outlined {
+    font-size: 2.4rem !important;
+  }
+  section .container > div[class='center'][style*='padding:'] > h3 {
+    font-size: 1.1rem !important;
+  }
+  section .container > div[class='center'][style*='padding:'] > p {
+    font-size: 0.92em !important;
+  }
+}
+
+/* Ultra compacto: 320px (mínimo hoy en día, cubre modelos viejo) */
+@media (max-width: 335px) {
+  .ticket-item .item-right h2 {
+    font-size: 1.25em !important;
+  }
+  .ticket-item .item-right strong {
+    font-size: 0.8em !important;
+  }
+  .top-search .search-inputs {
+    gap: 2px !important;
+    padding: 3px !important;
+  }
+  .top-search .search-inputs button {
+    padding: 9px 8px !important;
+    font-size: 0.82em !important;
+  }
+}
+
+/* Evitar el "bug del 100vh" en iOS Safari y Chrome Android (la barra de navegación tapa) */
+@supports (-webkit-touch-callout: none) {
+  body,
+  main,
+  .page-ctn {
+    min-height: 100dvh;
+  }
+}
+
+/* Safe-area en iOS con notch (iPhone X+, iPhone 14/15 Dynamic Island) */
+@supports (padding: max(0px)) {
+  .container {
+    padding-left: max(env(safe-area-inset-left, 0), 12px) !important;
+    padding-right: max(env(safe-area-inset-right, 0), 12px) !important;
+  }
+  @media (max-width: 420px) {
+    .container {
+      padding-left: max(env(safe-area-inset-left, 0), 10px) !important;
+      padding-right: max(env(safe-area-inset-right, 0), 10px) !important;
+    }
+  }
+  @media (max-width: 380px) {
+    .container {
+      padding-left: max(env(safe-area-inset-left, 0), 8px) !important;
+      padding-right: max(env(safe-area-inset-right, 0), 8px) !important;
+    }
+  }
+  /* Header/footer extra safe area */
+  header,
+  .site-header,
+  footer,
+  .site-footer {
+    padding-top: max(env(safe-area-inset-top, 0), 10px) !important;
+    padding-bottom: max(env(safe-area-inset-bottom, 0), 10px) !important;
+  }
+}
+
+/* Fix: header burger / links en mobile (si el menu se rompe) */
+@media (max-width: 800px) {
+  header nav,
+  .header-nav,
+  .header .links,
+  .header nav ul {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+  }
+  .header a.logo {
+    font-size: 1.2em !important;
+  }
+  .header .user-area > a,
+  .header .user-area > button {
+    padding: 8px 10px !important;
+    font-size: 0.9em !important;
+  }
+}
