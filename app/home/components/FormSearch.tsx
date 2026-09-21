@@ -60,7 +60,7 @@ const FormSearch: React.FC = () => {
           onChange={handleChange}
         />
         <button type='submit' aria-label='Buscar'>
-          <span className='material-symbols-outlined'>Buscar</span>
+          <span className='material-symbols-outlined'>search</span>
         </button>
       </div>
     </form>
