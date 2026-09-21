@@ -132,9 +132,10 @@ const TicketsClient: React.FC = () => {
     timersRef.current = [];
   };
 
+  const hydrated = !userLoading || bypassUserLoading;
+
   // ============================================================
-  // RED DE SEGURIDAD: userLoading NUNCA mas de 2500ms pegado.
-  // Si UserProvider se atasca (SSR/hidratacion/StrictMode), forzamos continuar.
+  // RED DE SEGURIDAD 1: userLoading NUNCA mas de 2500ms pegado.
   // ============================================================
   useEffect(() => {
     if (!userLoading || bypassUserLoading) return;
@@ -157,7 +158,7 @@ const TicketsClient: React.FC = () => {
     const maxWait = window.setTimeout(() => {
       setBypassUserLoading(true);
       pushDebug(
-        '⚠️ ⚠️ ⚠️  TIMEOUT HIDRATACION: Pasaron 2500ms y isLoading seguia true. Forzando continuar (bypassUserLoading=true). Si el usuario sigue en null, vuelve a iniciar sesion manualmente.'
+        '⚠️ ⚠️ ⚠️  TIMEOUT HIDRATACION: Pasaron 2500ms y isLoading seguia true. Forzando continuar (bypassUserLoading=true). Si el usuario sigue en null, lee localStorage a continuacion.'
       );
     }, 2500);
     timersRef.current.push(maxWait as unknown as number);
@@ -168,7 +169,39 @@ const TicketsClient: React.FC = () => {
     };
   }, [userLoading, bypassUserLoading, user]);
 
-  const hydrated = !userLoading || bypassUserLoading;
+  // ============================================================
+  // RED DE SEGURIDAD 2: Leer localStorage de forma DIRECTA y mostrar en debug
+  // (ignorar UserProvider si hay inconsistencia). Esto nos dice TODO.
+  // ============================================================
+  useEffect(() => {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) {
+        pushDebug('⚠️ localStorage no disponible aun (SSR).');
+        return;
+      }
+      const raw = window.localStorage.getItem('user') || '';
+      pushDebug(
+        `[LOCALSTORAGE] item 'user' raw length=${raw.length} chars. Preview: ${
+          raw.length > 0 ? raw.slice(0, 120) + (raw.length > 120 ? '...' : '') : '(VACIO: sin sesion guardada → hay que iniciar sesion primero!)'
+        }`
+      );
+      if (raw.length > 0) {
+        try {
+          const parsed = JSON.parse(raw);
+          pushDebug(
+            `[LOCALSTORAGE] Parse OK. Keys: ${Object.keys(parsed).join(', ')}. email=${
+              parsed.email || 'NO_EMAIL'}. cedula=${parsed.cedula || 'NO_CEDULA'}. name=${
+                parsed.name || 'NO_NAME'
+              }`
+          );
+        } catch (e: any) {
+          pushDebug(`[LOCALSTORAGE] ❌ JSON INVALIDO: ${e?.message || e}. Sesion corrupta → hay que borrarla y volver a iniciar.`);
+        }
+      }
+    } catch (e: any) {
+      pushDebug(`[LOCALSTORAGE] Excepcion leyendo: ${e?.message || e}`);
+    }
+  }, [hydrated]);
 
   useEffect(() => {
     pushDebug(
@@ -181,12 +214,12 @@ const TicketsClient: React.FC = () => {
 
     if (!hydrated) return;
 
+    // IMPORTANTE: Si user=null NO redirigimos SILENCIOSAMENTE. Mostramos panel AMARILLO explicativo (ver render).
     if (!user) {
-      pushDebug('Sin usuario → redirigiendo a signin.');
-      const t = window.setTimeout(() => {
-        router.replace('/members/signin');
-      }, 600);
-      timersRef.current.push(t as unknown as number);
+      pushDebug(
+        'hydrated=true y user=NULL → NO REDIRIGIMOS AUTOMATICAMENTE. Mostrando panel sesion no detectada al usuario.'
+      );
+      setLoading(false);
       return;
     }
 
@@ -619,6 +652,99 @@ const TicketsClient: React.FC = () => {
               Si esta pantalla dura más de 3 segundos, el sistema continuará automáticamente.
             </div>
             {showDebug && <DebugPanel lines={debug} title='Depuración' />}
+          </div>
+        </Section>
+      </Master>
+    );
+  }
+
+  // ============================================================
+  // ✅ PANEL AMARILLO: Sesión no detectada (hydrated && user === null)
+  // Esto reemplaza al redirect silencioso que parecía "pantalla pegada".
+  // El usuario VE lo que pasa y tiene botones de acción explícitos.
+  // ============================================================
+  if (!user) {
+    return (
+      <Master>
+        <Section className='white-background'>
+          <div className='container'>
+            <div className='center'>
+              <Heading type={1} color='gray' text='Mis Tickets' />
+              <p className='gray form-information'>
+                Puedes acceder a las entradas que compraste desde esta página en cualquier momento.
+                Puedes descargarlas en PDF o enviarlas por correo.
+              </p>
+              <div className='button-container'>
+                <ButtonGroup color='gray'>
+                  <ButtonGroupItem url='members/tickets' text='Mis Tickets' active />
+                  <ButtonGroupItem url='members/account' text='Mi cuenta' />
+                </ButtonGroup>
+              </div>
+            </div>
+          </div>
+        </Section>
+
+        <Section className='white-background' style={{ paddingTop: 0 }}>
+          <div className='container'>
+            <div
+              className='center'
+              style={{
+                padding: '44px 24px',
+                borderRadius: 'var(--r-lg)',
+                background: '#FFFBEB',
+                border: '1px solid #FDE68A',
+                maxWidth: '720px',
+                margin: '0 auto',
+              }}
+            >
+              <span
+                className='material-symbols-outlined'
+                style={{ fontSize: '3.5rem', color: '#B45309' }}
+              >
+                person_off
+              </span>
+              <Heading type={3} color='gray' text='No pudimos detectar tu sesión' style={{ marginTop: '12px' }} />
+              <p className='gray' style={{ marginTop: '10px', marginBottom: '8px' }}>
+                Para consultar tus tickets comprados, <strong>debes iniciar sesión primero</strong> con la misma
+                cuenta con la que los compraste.
+              </p>
+              <p
+                style={{
+                  marginTop: 0,
+                  color: '#92400E',
+                  fontSize: '0.92rem',
+                  maxWidth: 620,
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  lineHeight: 1.5,
+                }}
+              >
+                💡 <strong>Si crees que ya iniciaste sesión:</strong> puede que tu sesión haya expirado,
+                que estés en el navegador de incógnito, o que tengas bloqueadas las cookies.
+                Vuelve a iniciar sesión y revisa.
+              </p>
+
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '12px',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                  marginTop: '20px',
+                }}
+              >
+                <Link href='/members/signin' style={{ textDecoration: 'none' }}>
+                  <Button type='button' color='blue-filled' text='Iniciar sesión ahora' />
+                </Link>
+                <Link href='/' style={{ textDecoration: 'none' }}>
+                  <button className='button gray-overlay' style={{ cursor: 'pointer' }}>
+                    Volver al inicio
+                  </button>
+                </Link>
+              </div>
+            </div>
+
+            {showDebug && <DebugPanel lines={debug} title='Estado de carga' style={{ marginTop: 28 }} />}
           </div>
         </Section>
       </Master>
