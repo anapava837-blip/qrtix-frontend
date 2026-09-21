@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
 
@@ -106,62 +106,124 @@ const formatMoney = (v: number | undefined) => {
 
 const TicketsClient: React.FC = () => {
   const router = useRouter();
-  const { user, isLoading } = useUser();
+  const { user, isLoading: userLoading } = useUser();
 
   const [sales, setSales] = useState<ISale[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const [debug, setDebug] = useState<string[]>([]);
+  const didRunRef = useRef<boolean>(false);
+  const timersRef = useRef<number[]>([]);
+
+  const pushDebug = (m: string) => {
+    const t = new Date().toLocaleTimeString('es-CO', { hour12: false });
+    const line = `[${t}] ${m}`;
+    console.log('[MisTickets]', line);
+    setDebug((prev) => [...prev.slice(-12), line]);
+  };
+
+  const clearTimers = () => {
+    timersRef.current.forEach((t) => {
+      try { clearTimeout(t as unknown as ReturnType<typeof setTimeout>); } catch (_) {}
+    });
+    timersRef.current = [];
+  };
 
   useEffect(() => {
-    if (isLoading) return;
+    pushDebug(
+      `Render userLoading=${String(userLoading)}, user=${
+        user ? `yes (${user.email || user.cedula || 'sin-email'})` : 'null'
+      }, didRunRef=${String(didRunRef.current)}`
+    );
+
+    if (userLoading) return;
+
     if (!user) {
-      router.replace('/members/signin');
+      pushDebug('Sin usuario → redirigiendo a signin.');
+      const t = window.setTimeout(() => {
+        router.replace('/members/signin');
+      }, 600);
+      timersRef.current.push(t as unknown as number);
       return;
     }
 
+    if (didRunRef.current) {
+      pushDebug('ya se ejecutó didRunRef=true, saliendo.');
+      return;
+    }
+    didRunRef.current = true;
+
     let cancelled = false;
-    let maxTimer: ReturnType<typeof setTimeout> | null = setTimeout(() => {
-      if (!cancelled) {
-        console.warn('[MisTickets] Tiempo máximo de espera alcanzado.');
-        setErrorMsg('Tiempo de espera agotado. Verifica tu conexión e intenta de nuevo.');
-        setLoading(false);
-      }
-    }, 10000);
+
+    const timeoutMs = 12000;
+    pushDebug(`Iniciando carga de compras... timeout max ${timeoutMs}ms`);
+
+    const maxTimer = window.setTimeout(() => {
+      if (cancelled) return;
+      pushDebug(`TIMEOUT alcanzado (${timeoutMs}ms). Cargando modo fallback.`);
+      setErrorMsg(
+        `Tiempo de espera agotado (${Math.round(timeoutMs / 1000)}s). ` +
+        'El servidor de backend puede estar encendiéndose. Intenta de nuevo en 30 segundos o contacta soporte.'
+      );
+      setSales([]);
+      setLoading(false);
+    }, timeoutMs);
+    timersRef.current.push(maxTimer as unknown as number);
 
     const loadSales = async () => {
       setLoading(true);
       setErrorMsg('');
       try {
         const params = new URLSearchParams();
-        if (user.email) params.set('email', user.email);
-        else if (user.cedula) params.set('documentNumber', String(user.cedula));
+        if (user.email) {
+          params.set('email', user.email);
+        } else if (user.cedula) {
+          params.set('documentNumber', String(user.cedula));
+        } else {
+          setErrorMsg('Tu cuenta no tiene email ni cédula guardada. Por favor, vuelve a iniciar sesión.');
+          setLoading(false);
+          return;
+        }
 
         const endpoint = `api/sales/user${params.toString() ? `?${params.toString()}` : ''}`;
-        const res = await Request.getResponse({ url: endpoint, method: 'GET' });
+        pushDebug(`Llamando endpoint: ${endpoint}`);
 
+        const res = await Request.getResponse({ url: endpoint, method: 'GET' });
+        pushDebug(`Respuesta backend: status=${String(res.status)}`);
         if (cancelled) return;
 
         if (res.status === 200 && res.data?.results && Array.isArray(res.data.results)) {
+          pushDebug(`OK: ${res.data.results.length} compras encontradas.`);
           setSales(res.data.results as ISale[]);
-        } else if (res.status === 200 && Array.isArray((res.data as any))) {
+        } else if (res.status === 200 && Array.isArray(res.data as any)) {
+          pushDebug(`OK (array directo): ${(res.data as any).length} compras.`);
           setSales(res.data as unknown as ISale[]);
         } else {
           const msg =
             (res.data as any)?.detail ||
             (res.data as any)?.title ||
             'No se pudieron cargar las compras. Inténtalo más tarde.';
+          pushDebug(`Respuesta inesperada: ${msg}`);
+          setErrorMsg(`${msg}${res.status ? ` (status ${String(res.status)})` : ''}`);
           setSales([]);
-          setErrorMsg(msg);
         }
       } catch (err: any) {
-        if (!cancelled) {
-          console.error('[MisTickets] Error fetching sales:', err);
-          setSales([]);
-          setErrorMsg(err?.message || 'Error al conectar con el servidor.');
-        }
+        if (cancelled) return;
+        const mensaje = err?.message || String(err) || 'Error desconocido';
+        pushDebug(`ERROR en catch: ${mensaje}`);
+        console.error('[MisTickets] Error fetch completo:', err);
+        setErrorMsg(
+          `Error al conectar con el servidor. ${
+            err?.message ? `Detalles: ${err.message}` : 'Intenta de nuevo.'
+          }`
+        );
+        setSales([]);
       } finally {
-        if (maxTimer) { clearTimeout(maxTimer); maxTimer = null; }
-        if (!cancelled) setLoading(false);
+        try { clearTimeout(maxTimer); } catch (_) {}
+        if (!cancelled) {
+          pushDebug('Finalizado loading=false.');
+          setLoading(false);
+        }
       }
     };
 
@@ -169,9 +231,13 @@ const TicketsClient: React.FC = () => {
 
     return () => {
       cancelled = true;
-      if (maxTimer) { clearTimeout(maxTimer); maxTimer = null; }
+      clearTimers();
     };
-  }, [user, router, isLoading]);
+  }, [user, userLoading, router]);
+
+  useEffect(() => {
+    return () => { clearTimers(); };
+  }, []);
 
   const handleDownloadPdf = async (sale: ISale) => {
     try {
@@ -491,12 +557,17 @@ const TicketsClient: React.FC = () => {
     }
   };
 
-  if (isLoading) {
+  const showDebug = true;
+
+  if (userLoading) {
     return (
       <Master>
         <Section className='white-background'>
           <div className='container'>
             <Loader type='inline' color='gray' text='Verificando sesión...' />
+            {showDebug && (
+              <DebugPanel lines={debug} title='Depuración' />
+            )}
           </div>
         </Section>
       </Master>
@@ -519,6 +590,7 @@ const TicketsClient: React.FC = () => {
                 <ButtonGroupItem url='members/account' text='Mi cuenta' />
               </ButtonGroup>
             </div>
+            {showDebug && <DebugPanel lines={debug} title='Estado de carga' style={{ marginTop: 28 }} />}
           </div>
         </div>
       </Section>
@@ -528,6 +600,16 @@ const TicketsClient: React.FC = () => {
           {loading ? (
             <div style={{ padding: '60px 0' }}>
               <Loader type='inline' color='gray' text='Cargando tus compras...' />
+              <div
+                style={{
+                  textAlign: 'center',
+                  marginTop: 14,
+                  color: 'var(--gray, #64748b)',
+                  fontSize: '0.9rem',
+                }}
+              >
+                Si el servidor está encendiendo, esto puede tomar hasta 15 segundos la primera vez.
+              </div>
             </div>
           ) : errorMsg ? (
             <div
@@ -556,7 +638,17 @@ const TicketsClient: React.FC = () => {
                   <Button type='button' color='blue-filled' text='Ver eventos' />
                 </Link>
                 <button
-                  onClick={() => window.location.reload()}
+                  onClick={() => {
+                    pushDebug('Reintento manual del usuario.');
+                    didRunRef.current = false;
+                    setLoading(true);
+                    const params = new URLSearchParams();
+                    if (user?.email) params.set('email', user.email);
+                    else if (user?.cedula) params.set('documentNumber', String(user.cedula));
+                    window.location.href = params.toString()
+                      ? `/members/tickets?${params.toString()}`
+                      : '/members/tickets';
+                  }}
                   className='button gray-overlay'
                   style={{ cursor: 'pointer' }}
                 >
@@ -676,5 +768,51 @@ const TicketsClient: React.FC = () => {
     </Master>
   );
 };
+
+const DebugPanel: React.FC<{ lines: string[]; title: string; style?: React.CSSProperties }> = ({
+  lines,
+  title,
+  style,
+}) => (
+  <div
+    style={{
+      maxWidth: 720,
+      margin: '0 auto',
+      textAlign: 'left',
+      background: '#f1f5f9',
+      border: '1px solid #cbd5e1',
+      borderRadius: 12,
+      padding: '14px 18px',
+      fontSize: 12,
+      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+      lineHeight: 1.55,
+      color: '#0f172a',
+      ...style,
+    }}
+  >
+    <div
+      style={{
+        fontSize: 13,
+        fontWeight: 700,
+        marginBottom: 6,
+        color: '#334155',
+        fontFamily: 'inherit',
+      }}
+    >
+      🔎 {title}
+    </div>
+    {lines.length === 0 ? (
+      <div style={{ color: '#64748b', fontFamily: 'inherit' }}>
+        (aún no hay eventos de depuración. si se mantiene así, revisa que el usuario sí esté cargado en localStorage.)
+      </div>
+    ) : (
+      lines.map((l, i) => (
+        <div key={i} style={{ color: i === lines.length - 1 ? '#1d4ed8' : '#475569', fontFamily: 'inherit' }}>
+          • {l}
+        </div>
+      ))
+    )}
+  </div>
+);
 
 export default TicketsClient;
