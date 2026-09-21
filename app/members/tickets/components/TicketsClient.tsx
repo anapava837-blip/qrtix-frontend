@@ -15,6 +15,7 @@ import Loader from '@components/Loader/Loader';
 import Button from '@components/Button/Button';
 
 import useUser from '@hooks/useUser';
+import { type IUser } from '@contexts/userContext';
 import Request from '@utils/Request';
 import { getAllEvents, type Event } from '@data/events';
 
@@ -104,24 +105,47 @@ const formatMoney = (v: number | undefined) => {
   }
 };
 
+// ============================================================
+// 🔑 FIX DEFINITIVO: useLocalUser (NO dependemos de UserProvider!)
+// Leemos localStorage de forma DIRECTA y fiable.
+// El UserProvider puede fallar por hidratacion/StrictMode/whatever,
+// pero leer localStorage.getItem() de forma sincrona siempre funciona.
+// ============================================================
+function readLocalUserRaw(): { exists: boolean; parsed: any; error: string; raw: string } {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return { exists: false, parsed: null, error: 'window/no-localstorage (SSR)', raw: '' };
+  }
+  const raw = window.localStorage.getItem('user') || '';
+  if (!raw || raw.length === 0) {
+    return { exists: false, parsed: null, error: 'item-vacio: sin sesion guardada', raw: '' };
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    return { exists: true, parsed, error: '', raw };
+  } catch (e: any) {
+    return { exists: false, parsed: null, error: `JSON-invalido: ${e?.message || e}`, raw };
+  }
+}
+
 const TicketsClient: React.FC = () => {
   const router = useRouter();
-  const { user, isLoading: userLoading } = useUser();
+  const { user: providerUser, isLoading: providerLoading } = useUser();
 
   const [sales, setSales] = useState<ISale[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [debug, setDebug] = useState<string[]>([]);
-  const [bypassUserLoading, setBypassUserLoading] = useState<boolean>(false);
   const didRunRef = useRef<boolean>(false);
   const timersRef = useRef<number[]>([]);
-  const hydrationStartRef = useRef<number>(typeof performance !== 'undefined' ? performance.now() : Date.now());
+
+  const [localUser, setLocalUser] = useState<IUser | null>(null);
+  const [localUserHydrated, setLocalUserHydrated] = useState<boolean>(false);
 
   const pushDebug = (m: string) => {
     const t = new Date().toLocaleTimeString('es-CO', { hour12: false });
     const line = `[${t}] ${m}`;
     console.log('[MisTickets]', line);
-    setDebug((prev) => [...prev.slice(-14), line]);
+    setDebug((prev) => [...prev.slice(-16), line]);
   };
 
   const clearTimers = () => {
@@ -132,93 +156,85 @@ const TicketsClient: React.FC = () => {
     timersRef.current = [];
   };
 
-  const hydrated = !userLoading || bypassUserLoading;
-
-  // ============================================================
-  // RED DE SEGURIDAD 1: userLoading NUNCA mas de 2500ms pegado.
-  // ============================================================
-  useEffect(() => {
-    if (!userLoading || bypassUserLoading) return;
-
-    let ticks = 0;
-    const tick = window.setInterval(() => {
-      ticks += 1;
-      const elapsed =
-        typeof performance !== 'undefined'
-          ? Math.round(performance.now() - hydrationStartRef.current)
-          : ticks * 500;
-      pushDebug(
-        `SIGUE ESPERANDO userLoading=true... ${elapsed}ms transcurridos (user=${
-          user ? 'cargado' : 'null'
-        }, bypass=${String(bypassUserLoading)})`
-      );
-    }, 500);
-    timersRef.current.push(tick as unknown as number);
-
-    const maxWait = window.setTimeout(() => {
-      setBypassUserLoading(true);
-      pushDebug(
-        '⚠️ ⚠️ ⚠️  TIMEOUT HIDRATACION: Pasaron 2500ms y isLoading seguia true. Forzando continuar (bypassUserLoading=true). Si el usuario sigue en null, lee localStorage a continuacion.'
-      );
-    }, 2500);
-    timersRef.current.push(maxWait as unknown as number);
-
-    return () => {
-      try { clearInterval(tick); } catch (_) {}
-      try { clearTimeout(maxWait); } catch (_) {}
-    };
-  }, [userLoading, bypassUserLoading, user]);
-
-  // ============================================================
-  // RED DE SEGURIDAD 2: Leer localStorage de forma DIRECTA y mostrar en debug
-  // (ignorar UserProvider si hay inconsistencia). Esto nos dice TODO.
-  // ============================================================
+  // === HIDRATAR LOCAL USER (1 vez, sincrono, primera hidratacion del navegador) ===
   useEffect(() => {
     try {
-      if (typeof window === 'undefined' || !window.localStorage) {
-        pushDebug('⚠️ localStorage no disponible aun (SSR).');
-        return;
-      }
-      const raw = window.localStorage.getItem('user') || '';
-      pushDebug(
-        `[LOCALSTORAGE] item 'user' raw length=${raw.length} chars. Preview: ${
-          raw.length > 0 ? raw.slice(0, 120) + (raw.length > 120 ? '...' : '') : '(VACIO: sin sesion guardada → hay que iniciar sesion primero!)'
-        }`
-      );
-      if (raw.length > 0) {
-        try {
-          const parsed = JSON.parse(raw);
-          pushDebug(
-            `[LOCALSTORAGE] Parse OK. Keys: ${Object.keys(parsed).join(', ')}. email=${
-              parsed.email || 'NO_EMAIL'}. cedula=${parsed.cedula || 'NO_CEDULA'}. name=${
-                parsed.name || 'NO_NAME'
-              }`
-          );
-        } catch (e: any) {
-          pushDebug(`[LOCALSTORAGE] ❌ JSON INVALIDO: ${e?.message || e}. Sesion corrupta → hay que borrarla y volver a iniciar.`);
-        }
+      const r = readLocalUserRaw();
+      if (!r.exists) {
+        pushDebug(
+          `[LOCAL USER readLocalUserRaw()] NO HAY SESION: error="${r.error}", length=${r.raw.length} chars.`
+        );
+        setLocalUser(null);
+      } else {
+        const u: IUser = {
+          id: String(r.parsed?.id ?? r.parsed?._id ?? 'temp-id'),
+          name: String(r.parsed?.name ?? r.parsed?.firstName ?? ''),
+          lastname: String(r.parsed?.lastname ?? r.parsed?.lastName ?? ''),
+          email: String(r.parsed?.email ?? ''),
+          photo: String(r.parsed?.photo ?? ''),
+          cedula: r.parsed?.cedula ?? r.parsed?.documentNumber ?? null,
+          telefono: r.parsed?.telefono ?? r.parsed?.phone ?? null,
+        };
+        setLocalUser(u);
+        pushDebug(
+          `[LOCAL USER readLocalUserRaw()] CARGADO OK: length=${r.raw.length} chars, keys=${
+            Object.keys(r.parsed || {}).join(',')
+          }, name=${u.name || 'NULL'}, lastname=${u.lastname || 'NULL'}, email=${u.email || 'NULL'}, cedula=${
+            u.cedula ? String(u.cedula) : 'NULL'
+          }, telefono=${u.telefono ? String(u.telefono) : 'NULL'}`
+        );
       }
     } catch (e: any) {
-      pushDebug(`[LOCALSTORAGE] Excepcion leyendo: ${e?.message || e}`);
+      pushDebug(`[LOCAL USER readLocalUserRaw()] ❌ Exception: ${e?.message || e}`);
+      setLocalUser(null);
+    } finally {
+      setLocalUserHydrated(true);
     }
-  }, [hydrated]);
+  }, []);
 
+  // === LOG EARLY: UserProvider value vs Local ===
   useEffect(() => {
     pushDebug(
-      `Render userLoading=${String(userLoading)}, bypass=${String(bypassUserLoading)}, hydrated=${String(
-        hydrated
-      )}, user=${user ? `yes (${user.email || user.cedula || 'sin-email'})` : 'null'}, didRunRef=${String(
-        didRunRef.current
-      )}`
+      `COMPARACION SESION: providerLoading=${String(providerLoading)}, providerUser=${
+        providerUser
+          ? `SÍ (name=${providerUser.name || '?'}, email=${providerUser.email || '?'}, cedula=${
+              providerUser.cedula ? String(providerUser.cedula) : '?'
+            })`
+          : 'NULL'
+      }, localUserHydrated=${String(localUserHydrated)}, localUser=${
+        localUser
+          ? `SÍ (name=${localUser.name || '?'}, email=${localUser.email || '?'}, cedula=${
+              localUser.cedula ? String(localUser.cedula) : '?'
+            })`
+          : 'NULL'
+      }, didRunRef=${String(didRunRef.current)}`
     );
+  }, [providerLoading, providerUser, localUserHydrated, localUser]);
 
+  // 🎯 effectiveUser: preferimos localUser (más fiable), sino providerUser.
+  // Esta variable es LA QUE USAMOS en TODO el resto del componente.
+  const effectiveUser: IUser | null = localUser ?? providerUser;
+  // hidratado: cuando localUserHydrated === true (solo esperamos ESTO, no el provider)
+  const hydrated = localUserHydrated;
+
+  // ============================================================
+  // 🎯 FLUJO PRINCIPAL: si efectivamente hay usuario => cargar ventas.
+  // Si no => panel amarillo sesion no detectada (render).
+  // ============================================================
+  useEffect(() => {
     if (!hydrated) return;
 
-    // IMPORTANTE: Si user=null NO redirigimos SILENCIOSAMENTE. Mostramos panel AMARILLO explicativo (ver render).
-    if (!user) {
-      pushDebug(
-        'hydrated=true y user=NULL → NO REDIRIGIMOS AUTOMATICAMENTE. Mostrando panel sesion no detectada al usuario.'
-      );
+    pushDebug(
+      `FLUJO PRINCIPAL hydrated=true. effectiveUser=${
+        effectiveUser
+          ? `SÍ (name=${effectiveUser.name || '?'}, email=${effectiveUser.email || '?'}, cedula=${
+              effectiveUser.cedula ? String(effectiveUser.cedula) : '?'
+            })`
+          : 'NULL - mostrando panel amarillo sesion no detectada'
+      }, didRunRef=${String(didRunRef.current)}`
+    );
+
+    if (!effectiveUser) {
       setLoading(false);
       return;
     }
@@ -231,12 +247,12 @@ const TicketsClient: React.FC = () => {
 
     let cancelled = false;
 
-    const timeoutMs = 12000;
+    const timeoutMs = 15000;
     pushDebug(`Iniciando carga de compras... timeout max ${timeoutMs}ms`);
 
     const maxTimer = window.setTimeout(() => {
       if (cancelled) return;
-      pushDebug(`TIMEOUT alcanzado (${timeoutMs}ms). Cargando modo fallback.`);
+      pushDebug(`TIMEOUT alcanzado (${timeoutMs}ms). Mostrando error.`);
       setErrorMsg(
         `Tiempo de espera agotado (${Math.round(timeoutMs / 1000)}s). ` +
         'El servidor de backend puede estar encendiéndose. Intenta de nuevo en 30 segundos o contacta soporte.'
@@ -251,10 +267,10 @@ const TicketsClient: React.FC = () => {
       setErrorMsg('');
       try {
         const params = new URLSearchParams();
-        if (user.email) {
-          params.set('email', user.email);
-        } else if (user.cedula) {
-          params.set('documentNumber', String(user.cedula));
+        if (effectiveUser.email && String(effectiveUser.email).trim().length > 0) {
+          params.set('email', String(effectiveUser.email));
+        } else if (effectiveUser.cedula && String(effectiveUser.cedula).trim().length > 0) {
+          params.set('documentNumber', String(effectiveUser.cedula));
         } else {
           setErrorMsg('Tu cuenta no tiene email ni cédula guardada. Por favor, vuelve a iniciar sesión.');
           setLoading(false);
@@ -291,14 +307,13 @@ const TicketsClient: React.FC = () => {
         setErrorMsg(
           `Error al conectar con el servidor. ${
             err?.message ? `Detalles: ${err.message}` : 'Intenta de nuevo.'
-          }`
+          } Si es la primera vez que entras en 15min, Render puede tardar hasta 20s en encender. Vuelve a dar clic en Reintentar.`
         );
         setSales([]);
       } finally {
-        try { clearTimeout(maxTimer); } catch (_) {}
         if (!cancelled) {
-          pushDebug('Finalizado loading=false.');
           setLoading(false);
+          pushDebug('Finalizado loading=false.');
         }
       }
     };
@@ -309,7 +324,7 @@ const TicketsClient: React.FC = () => {
       cancelled = true;
       clearTimers();
     };
-  }, [user, userLoading, router]);
+  }, [hydrated, effectiveUser, router]);
 
   useEffect(() => {
     return () => { clearTimers(); };
@@ -327,14 +342,14 @@ const TicketsClient: React.FC = () => {
 
       const event = resolveEvent(sale);
 
-      const firstName = sale.firstName || user?.name || 'Usuario';
-      const lastName = sale.lastName || user?.lastname || 'QRTixPro';
+      const firstName = sale.firstName || effectiveUser?.name || 'Usuario';
+      const lastName = sale.lastName || effectiveUser?.lastname || 'QRTixPro';
       const fullName = `${firstName} ${lastName}`.trim();
       const document = `${sale.documentType || 'C.C'} - ${
-        sale.documentNumber || user?.cedula || '00000000'
+        sale.documentNumber || effectiveUser?.cedula || '00000000'
       }`;
-      const email = sale.email || user?.email || 'correo@correo.com';
-      const phone = sale.phone || user?.telefono || '0000000000';
+      const email = sale.email || effectiveUser?.email || 'correo@correo.com';
+      const phone = sale.phone || effectiveUser?.telefono || '0000000000';
 
       const safeSeats =
         sale.seats && Array.isArray(sale.seats) && sale.seats.length > 0
@@ -410,7 +425,7 @@ const TicketsClient: React.FC = () => {
           seat: seatNum,
           price,
           customerName: fullName,
-          customerDocument: sale.documentNumber || user?.cedula || '',
+          customerDocument: sale.documentNumber || effectiveUser?.cedula || '',
           customerEmail: email,
           issuedAt: new Date().toISOString(),
           valid: true,
@@ -659,11 +674,9 @@ const TicketsClient: React.FC = () => {
   }
 
   // ============================================================
-  // ✅ PANEL AMARILLO: Sesión no detectada (hydrated && user === null)
-  // Esto reemplaza al redirect silencioso que parecía "pantalla pegada".
-  // El usuario VE lo que pasa y tiene botones de acción explícitos.
+  // ✅ PANEL AMARILLO: Sesión no detectada.
   // ============================================================
-  if (!user) {
+  if (!effectiveUser) {
     return (
       <Master>
         <Section className='white-background'>
@@ -820,8 +833,8 @@ const TicketsClient: React.FC = () => {
                     didRunRef.current = false;
                     setLoading(true);
                     const params = new URLSearchParams();
-                    if (user?.email) params.set('email', user.email);
-                    else if (user?.cedula) params.set('documentNumber', String(user.cedula));
+                    if (effectiveUser?.email) params.set('email', effectiveUser.email);
+                    else if (effectiveUser?.cedula) params.set('documentNumber', String(effectiveUser.cedula));
                     window.location.href = params.toString()
                       ? `/members/tickets?${params.toString()}`
                       : '/members/tickets';
